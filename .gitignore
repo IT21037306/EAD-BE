@@ -1,0 +1,4 @@
+.env
+Config/MongoDbConnectionChecker.cs
+bin/
+obj/Debug/net8.0/EAD-BE.sourcelink.json
