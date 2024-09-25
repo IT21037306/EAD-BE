@@ -1,3 +1,4 @@
+// EAD-BE/Program.cs
 using System.Text;
 using EAD_BE.Config;
 using AspNetCore.Identity.MongoDbCore.Models;
@@ -5,6 +6,7 @@ using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using DotNetEnv;
+using EAD_BE.Config.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Bson;
@@ -36,8 +38,10 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddAuthorization();
 
-var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
+// Register RoleInitializer as a service
+builder.Services.AddScoped<RoleInitializer>();
 
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.AddAuthentication(options =>
@@ -58,7 +62,6 @@ builder.Services.AddAuthentication(options =>
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey))
         };
     });
-
 
 var app = builder.Build();
 
@@ -81,6 +84,14 @@ if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
     var database = client.GetDatabase(dbName);
     // This will create the database if it does not exist
     await database.RunCommandAsync((Command<BsonDocument>)"{ping:1}");
+}
+
+// Initialize roles
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var roleInitializer = services.GetRequiredService<RoleInitializer>();
+    await roleInitializer.InitializeRoles();
 }
 
 // Configure the HTTP request pipeline.
