@@ -14,6 +14,7 @@ public class AuthController : ControllerBase
     private readonly UserManager<MongoIdentityUser<Guid>> _userManager;
     private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
     private readonly SignInManager<MongoIdentityUser<Guid>> _signInManager;
+    private string[] roles = ["Admin", "User", "Vendor", "CSR"];
 
 
     public AuthController(UserManager<MongoIdentityUser<Guid>> userManager, SignInManager<MongoIdentityUser<Guid>> signInManager)
@@ -30,6 +31,11 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = "Invalid data provided" });
         }
 
+        if (!roles.Select(r => r.ToLower()).Contains(request.Role.ToLower()))
+        {
+            return BadRequest(new { Message = "Invalid role provided" });
+        }
+
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
         {
@@ -39,7 +45,7 @@ public class AuthController : ControllerBase
         var user = new MongoIdentityUser<Guid>
         {
             UserName = request.UserName,
-            Email = request.Email
+            Email = request.Email,
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -52,6 +58,8 @@ public class AuthController : ControllerBase
             }
             return BadRequest(new { Message = "User creation failed", Errors = ModelState });
         }
+
+        await _userManager.AddToRoleAsync(user, request.Role);
 
         // Store the user details as SignUpModel object
         _signUpModels.Add(request);
@@ -88,6 +96,8 @@ public class AuthController : ControllerBase
             return Unauthorized(new { Message = "Invalid password" });
         }
 
+        var roles = await _userManager.GetRolesAsync(user);
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"));
         var tokenDescriptor = new SecurityTokenDescriptor()
@@ -111,7 +121,8 @@ public class AuthController : ControllerBase
         {
             user.Id,
             user.UserName,
-            user.Email
+            user.Email,
+            Roles = roles
         };
 
         return Ok(new { Message = "Login successful", Token = tokenString, User = userDto });
