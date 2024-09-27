@@ -98,7 +98,11 @@ using (var scope = app.Services.CreateScope())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint(Environment.GetEnvironmentVariable("DEV_ENV_DEFAULT_URL"), Environment.GetEnvironmentVariable("DEV_ENV_API_NAME"));
+        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+    });
 }
 
 app.UseHttpsRedirection();
