@@ -1,22 +1,14 @@
+# Ignore .env files
 .env
-Config/MongoDbConnectionChecker.cs
+
+# Ignore build output directories
+out/
 bin/
-obj/Debug/net8.0/EAD-BE.sourcelink.json
-EAD-BE.csproj
-obj/Debug/net8.0/EAD-BE.AssemblyInfo.cs
-obj/Debug/net8.0/EAD-BE.AssemblyInfoInputs.cache
-obj/Debug/net8.0/EAD-BE.assets.cache
-obj/Debug/net8.0/EAD-BE.csproj.AssemblyReference.cache
-obj/Debug/net8.0/EAD-BE.csproj.CoreCompileInputs.cache
-obj/Debug/net8.0/EAD-BE.csproj.FileListAbsolute.txt
-obj/Debug/net8.0/EAD-BE.dll
-obj/Debug/net8.0/EAD-BE.pdb
-obj/Debug/net8.0/ref/EAD-BE.dll
-obj/Debug/net8.0/refint/EAD-BE.dll
-obj/EAD-BE.csproj.nuget.dgspec.json
-obj/project.assets.json
-obj/project.nuget.cache
-obj/project.packagespec.json
-obj/rider.project.model.nuget.info
-obj/rider.project.restore.info
 obj/
+
+# Ignore Rider IDE files
+.idea/
+*.sln.iml
+
+# Ignore Docker-related files
+docker-compose.override.yml
