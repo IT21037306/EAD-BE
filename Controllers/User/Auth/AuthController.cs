@@ -2,6 +2,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using AspNetCore.Identity.MongoDbCore.Models;
+using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using EAD_BE.Models.UserManagement;
@@ -11,13 +12,12 @@ using Microsoft.IdentityModel.Tokens;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<MongoIdentityUser<Guid>> _userManager;
+    private readonly UserManager<CustomApplicationUser> _userManager;
     private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
-    private readonly SignInManager<MongoIdentityUser<Guid>> _signInManager;
-    private string[] roles = ["Admin", "User", "Vendor", "CSR"];
+    private readonly SignInManager<CustomApplicationUser> _signInManager;
+    private string[] roles = { "Admin", "User", "Vendor", "CSR" };
 
-
-    public AuthController(UserManager<MongoIdentityUser<Guid>> userManager, SignInManager<MongoIdentityUser<Guid>> signInManager)
+    public AuthController(UserManager<CustomApplicationUser> userManager, SignInManager<CustomApplicationUser> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -42,10 +42,11 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = "Email is already in use" });
         }
 
-        var user = new MongoIdentityUser<Guid>
+        var user = new CustomApplicationUser
         {
             UserName = request.UserName,
             Email = request.Email,
+            State = "inactive"
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);

@@ -1,5 +1,6 @@
 using AspNetCore.Identity.MongoDbCore.Models;
 using EAD_BE.Models.CSR.UserManagement;
+using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
@@ -8,12 +9,12 @@ namespace EAD_BE.Controllers.CSR.UserManagement
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize (Roles = "CSR")]
+    [Authorize (Roles = "CSR,Admin")]
     public class UserManagement : ControllerBase
     {
-        private readonly UserManager<MongoIdentityUser<Guid>> _userManager;
+        private readonly UserManager<CustomApplicationUser> _userManager;
 
-        public UserManagement(UserManager<MongoIdentityUser<Guid>> userManager)
+        public UserManagement(UserManager<CustomApplicationUser> userManager)
         {
             _userManager = userManager;
         }
