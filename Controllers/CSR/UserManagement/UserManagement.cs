@@ -25,5 +25,37 @@ namespace EAD_BE.Controllers.CSR.UserManagement
             var users = _userManager.Users.ToList();
             return Ok(users);
         }
+        
+        [HttpPatch("update-user-state")]
+        public async Task<IActionResult> UpdateUserState([FromBody] UpdateStateModel request)
+        {
+            var user = await _userManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            if (user.State == "inactive")
+            {
+                user.State = "active";
+            }
+            else if (user.State == "active")
+            {
+                user.State = "inactive";
+            }
+            else
+            {
+                return BadRequest(new { Message = "Invalid user state" });
+            }
+
+            var result = await _userManager.UpdateAsync(user);
+
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { Message = "Failed to update user state", Errors = result.Errors });
+            }
+
+            return Ok(new { Message = "User state updated successfully"});
+        }
     }
 }
