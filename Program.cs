@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using DotNetEnv;
 using EAD_BE.Config.User;
+using EAD_BE.Data;
 using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -34,6 +35,8 @@ builder.Services.AddSingleton<IMongoDbSettings>(sp =>
 //         Environment.GetEnvironmentVariable("MONGO_URL"),
 //         Environment.GetEnvironmentVariable("DB_NAME"))
 //     .AddDefaultTokenProviders();
+
+builder.Services.AddSingleton<MongoDbContextProduct>();
 
 builder.Services.AddIdentity<CustomApplicationUser, MongoIdentityRole<Guid>>()
     .AddMongoDbStores<CustomApplicationUser, MongoIdentityRole<Guid>, Guid>(

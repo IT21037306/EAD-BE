@@ -82,6 +82,11 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(new { Message = "Email not found" });
         }
+        
+        if (user.State == "inactive")
+        {
+            return Unauthorized(new { Message = "Account is suspended. Please contact CSR." });
+        }
 
         var result = await _signInManager.PasswordSignInAsync(user.UserName, request.Password, isPersistent: false, lockoutOnFailure: false);
 
