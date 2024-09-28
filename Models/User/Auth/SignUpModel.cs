@@ -6,6 +6,7 @@ namespace EAD_BE.Models.UserManagement
         public string Email { get; set; }
         public string Password { get; set; }
         public string Role {get; set;}
+        public string State { get; set; } = "inactive";
     }
 }
 
