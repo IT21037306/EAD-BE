@@ -9,6 +9,7 @@ using DotNetEnv;
 using EAD_BE.Config.User;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDbSettings = EAD_BE.Config.MongoDbSettings;
@@ -35,7 +36,36 @@ builder.Services.AddIdentity<MongoIdentityUser<Guid>, MongoIdentityRole<Guid>>()
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo() { Title = "My API", Version = "v1" });
+
+    // Add Bearer token authentication
+    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Description = "Please enter a valid token",
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        BearerFormat = "JWT",
+        Scheme = "Bearer"
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 builder.Services.AddAuthorization();
 
 // Register RoleInitializer as a service
@@ -95,14 +125,20 @@ using (var scope = app.Services.CreateScope())
 }
 
 // Configure the HTTP request pipeline.
+// if (app.Environment.IsDevelopment())
+// {
+//     app.UseSwagger();
+//     app.UseSwaggerUI(c =>
+//     {
+//         c.SwaggerEndpoint(Environment.GetEnvironmentVariable("DEV_ENV_DEFAULT_URL"), Environment.GetEnvironmentVariable("DEV_ENV_API_NAME"));
+//         c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
+//     });
+// }
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint(Environment.GetEnvironmentVariable("DEV_ENV_DEFAULT_URL"), Environment.GetEnvironmentVariable("DEV_ENV_API_NAME"));
-        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-    });
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
