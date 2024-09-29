@@ -7,8 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using DotNetEnv;
 using EAD_BE.Config.User;
+using EAD_BE.Config.Vendor;
 using EAD_BE.Data;
 using EAD_BE.Models.User.Common;
+using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -82,6 +84,35 @@ builder.Services.AddAuthorization();
 // Register RoleInitializer as a service
 builder.Services.AddScoped<RoleInitializer>();
 
+// Ensure the database is created if it does not exist and check the connection
+var mongoUrl = Environment.GetEnvironmentVariable("MONGO_URL");
+var dbName = Environment.GetEnvironmentVariable("DB_NAME");
+
+if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
+{
+    var connectionChecker = new MongoDbConnectionChecker(mongoUrl, dbName);
+    var isConnected = await connectionChecker.CheckConnectionAsync();
+
+    if (!isConnected)
+    {
+        Console.WriteLine("Failed to connect to MongoDB. Please check your connection settings.");
+        return;
+    }
+
+    var client = new MongoClient(mongoUrl);
+    var database = client.GetDatabase(dbName);
+    // This will create the database if it does not exist
+    await database.RunCommandAsync((Command<BsonDocument>)"{ping:1}");
+    
+    // Register the CategoryInitializer service
+    var categoryCollection = database.GetCollection<CategoryModel>("Categories");
+
+    builder.Services.AddSingleton(categoryCollection);
+    builder.Services.AddTransient<CategoryInitializer>();
+}
+
+
+
 var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
 
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
@@ -106,33 +137,18 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Ensure the database is created if it does not exist and check the connection
-var mongoUrl = Environment.GetEnvironmentVariable("MONGO_URL");
-var dbName = Environment.GetEnvironmentVariable("DB_NAME");
 
-if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
-{
-    var connectionChecker = new MongoDbConnectionChecker(mongoUrl, dbName);
-    var isConnected = await connectionChecker.CheckConnectionAsync();
 
-    if (!isConnected)
-    {
-        Console.WriteLine("Failed to connect to MongoDB. Please check your connection settings.");
-        return;
-    }
-
-    var client = new MongoClient(mongoUrl);
-    var database = client.GetDatabase(dbName);
-    // This will create the database if it does not exist
-    await database.RunCommandAsync((Command<BsonDocument>)"{ping:1}");
-}
-
-// Initialize roles
+// Initialize roles and categories
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var roleInitializer = services.GetRequiredService<RoleInitializer>();
     await roleInitializer.InitializeRoles();
+    
+    // Initialize categories
+    var categoryInitializer = services.GetRequiredService<CategoryInitializer>();
+    await categoryInitializer.InitializeCategories();
 }
 
 // Configure the HTTP request pipeline.
