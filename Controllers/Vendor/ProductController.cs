@@ -15,11 +15,14 @@ namespace EAD_BE.Controllers.Vendor
     {
         private readonly MongoDbContextProduct _context;
         private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly IMongoCollection<CategoryModel> _categoryCollection;
+        
 
-        public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager)
+        public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager, IMongoCollection<CategoryModel> categoryCollection)
         {
             _context = context;
             _userManager = userManager;
+            _categoryCollection = categoryCollection;
         }
 
         [HttpPost("add-product")]
@@ -39,6 +42,14 @@ namespace EAD_BE.Controllers.Vendor
             if (user == null)
             {
                 return BadRequest(new { Message = "User does not exist" });
+            }
+            
+
+            // Check if the category exists in the database
+            var category = await _categoryCollection.Find(c => c.Id == product.Category).FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return BadRequest(new { Message = "Category does not exist" });
             }
 
             product.Id = Guid.NewGuid();
