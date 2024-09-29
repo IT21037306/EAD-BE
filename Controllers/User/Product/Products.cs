@@ -25,26 +25,46 @@ public class Products : ControllerBase
     [HttpGet("all-products")]
     public async Task<IActionResult> GetAllProducts()
     {
-        var products = await _context.Products.Find(_ => true).ToListAsync();
-        var productWithCategoryDetails = new List<object>();
-
-        foreach (var product in products)
+        try
         {
-            var category = await _categoryCollection.Find(c => c.Id == product.Category).FirstOrDefaultAsync();
-            productWithCategoryDetails.Add(new
+            var products = await _context.Products.Find(_ => true).ToListAsync();
+            if (products == null || !products.Any())
             {
-                product.Id,
-                product.Name,
-                product.Description,
-                product.Price,
-                product.StockQuantity,
-                Category = category != null ? new { category.Id, category.Name } : null,
-                product.CreatedAt,
-                product.UpdatedAt,
-                product.AddedByUserId
-            });
-        }
+                return NotFound(new { Message = "No products found" });
+            }
 
-        return Ok(productWithCategoryDetails);
+            var productWithCategoryDetails = new List<object>();
+
+            foreach (var product in products)
+            {
+                var category = await _categoryCollection.Find(c => c.Id == product.Category && c.IsActive).FirstOrDefaultAsync();
+                if (category != null)
+                {
+                    productWithCategoryDetails.Add(new
+                    {
+                        product.Id,
+                        product.Name,
+                        product.Description,
+                        product.Price,
+                        product.StockQuantity,
+                        Category = new { category.Id, category.Name },
+                        product.CreatedAt,
+                        product.UpdatedAt,
+                        product.AddedByUserId
+                    });
+                }
+            }
+
+            if (!productWithCategoryDetails.Any())
+            {
+                return NotFound(new { Message = "No products found with active categories" });
+            }
+
+            return Ok(productWithCategoryDetails);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred while retrieving products", Details = ex.Message });
+        }
     }
 }

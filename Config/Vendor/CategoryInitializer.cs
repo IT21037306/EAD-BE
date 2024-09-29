@@ -21,7 +21,7 @@ namespace EAD_BE.Config.Vendor
                 var existingCategory = await _categoryCollection.Find(c => c.Name == category).FirstOrDefaultAsync();
                 if (existingCategory == null)
                 {
-                    await _categoryCollection.InsertOneAsync(new CategoryModel() { Name = category });
+                    await _categoryCollection.InsertOneAsync(new CategoryModel() { Name = category , IsActive = true});
                 }
             }
         }
