@@ -1,0 +1,37 @@
+using EAD_BE.Models.Vendor.Product;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+
+namespace EAD_BE.Controllers.Vendor
+{
+    [ApiController]
+    [Route("api/[controller]")]
+    [Authorize(Roles = "Vendor,Admin")]
+    public class CategoryController : ControllerBase
+    {
+        private readonly IMongoCollection<CategoryModel> _categoryCollection;
+
+        public CategoryController(IMongoCollection<CategoryModel> categoryCollection)
+        {
+            _categoryCollection = categoryCollection;
+        }
+
+        [HttpPut("update-category-status/{id}")]
+        public async Task<IActionResult> UpdateCategoryStatus(Guid id)
+        {
+            var category = await _categoryCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return NotFound(new { Message = "Category not found" });
+            }
+
+            // Toggle the IsActive state
+            var newIsActiveState = !category.IsActive;
+            var update = Builders<CategoryModel>.Update.Set(c => c.IsActive, newIsActiveState);
+            await _categoryCollection.UpdateOneAsync(c => c.Id == id, update);
+
+            return Ok(new { Message = "Category status updated successfully", IsActive = newIsActiveState });
+        }
+    }
+}
