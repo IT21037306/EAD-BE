@@ -1,8 +1,10 @@
 using EAD_BE.Data;
 using EAD_BE.Models.User.Cart;
+using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace EAD_BE.Controllers.User.Order
 {
@@ -13,12 +15,14 @@ namespace EAD_BE.Controllers.User.Order
     {
         private readonly IMongoCollection<Cart> _cartCollection;
         private readonly MongoDbContextProduct _context;
+        private readonly UserManager<CustomApplicationUser> _userManager;
 
-        public CartController(IMongoCollection<Cart> cartCollection , MongoDbContextProduct context)
+        public CartController(IMongoCollection<Cart> cartCollection , MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager)
         {
             _cartCollection = cartCollection;
             _context = context;
-        }
+            _userManager = userManager;
+        }  
 
         [HttpPost("add")]
         public async Task<IActionResult> AddToCart(Guid userId, [FromBody] CartItemInput cartItemInput)
@@ -221,7 +225,28 @@ namespace EAD_BE.Controllers.User.Order
             );
 
             return Ok(new { Message = "Item quantity updated successfully" });
-        }        
+        }
+        
+        [HttpGet("{userId}")]
+        public async Task<IActionResult> GetCartByUserId(Guid userId)
+        {
+            // Check if the user exists
+            var userExists = await _userManager.FindByIdAsync(userId.ToString());
+            if (userExists == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            // Fetch the cart based on the UserId
+            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+
+            if (cart == null)
+            {
+                return NotFound(new { Message = "Cart not found for the specified user" });
+            }
+
+            return Ok(cart);
+        }
 
     }
 }
