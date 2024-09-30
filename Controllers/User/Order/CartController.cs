@@ -300,6 +300,54 @@ namespace EAD_BE.Controllers.User.Order
 
             return Ok(cart);
         }
+        
+        [HttpDelete("clear-cart/{userEmail}")]
+        public async Task<IActionResult> ClearCart(String userEmail)
+        {
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+            
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to view this cart" });
+            }
+
+            // Fetch the cart based on the UserEmail
+            var cart = await _cartCollection.Find(c => c.UserEmail == currentUser.Email).FirstOrDefaultAsync();
+
+            if (cart == null)
+            {
+                return NotFound(new { Message = "Cart not found" });
+            }
+
+            // Clear all items from the cart
+            cart.Items.Clear();
+
+            // If no items are left in the cart, remove the cart object
+            if (!cart.Items.Any())
+            {
+                await _cartCollection.DeleteOneAsync(c => c.CartUuid == cart.CartUuid);
+            }
+            else
+            {
+                // Update the last modified time
+                cart.UpdatedAt = DateTime.UtcNow;
+
+                // Save the updated cart
+                await _cartCollection.ReplaceOneAsync(
+                    c => c.CartUuid == cart.CartUuid,
+                    cart,
+                    new ReplaceOptions { IsUpsert = true }
+                );
+            }
+
+            return Ok(new { Message = "Cart cleared successfully" });
+        }
 
     }
 }
