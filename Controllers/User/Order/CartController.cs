@@ -24,8 +24,8 @@ namespace EAD_BE.Controllers.User.Order
             _userManager = userManager;
         }  
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart(Guid userId, [FromBody] CartItemInput cartItemInput)
+        [HttpPost("add/{userEmail}")]
+        public async Task<IActionResult> AddToCart(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
             if (cartItemInput == null || cartItemInput.ProductId == Guid.Empty || cartItemInput.Quantity <= 0)
             {
@@ -46,15 +46,28 @@ namespace EAD_BE.Controllers.User.Order
                 return BadRequest(new { Message = "Insufficient stock for the product" });
             }
 
-            // Fetch the cart based on the UserId
-            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+            
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to view this cart" });
+            }
+
+            // Fetch the cart based on the UserEmail
+            var cart = await _cartCollection.Find(c => c.UserEmail == currentUser.Email).FirstOrDefaultAsync();
 
             // If no cart exists, create a new one
             if (cart == null)
             {
                 cart = new Cart
                 {
-                    UserId = userId,
+                    UserEmail = currentUser.Email,
                     CartUuid = Guid.NewGuid(), // Ensure CartUuid is set
                     CreatedAt = DateTime.UtcNow,
                     UpdatedAt = DateTime.UtcNow,
@@ -99,8 +112,8 @@ namespace EAD_BE.Controllers.User.Order
             return Ok(new { Message = "Item added to cart successfully" });
         }
         
-        [HttpPut("update-quantity-add")]
-        public async Task<IActionResult> UpdateCartItemQuantityAdd(Guid userId, [FromBody] CartItemInput cartItemInput)
+        [HttpPut("update-quantity-add/{userEmail}")]
+        public async Task<IActionResult> UpdateCartItemQuantityAdd(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
             if (cartItemInput == null || cartItemInput.ProductId == Guid.Empty || cartItemInput.Quantity <= 0)
             {
@@ -115,8 +128,21 @@ namespace EAD_BE.Controllers.User.Order
                 return NotFound(new { Message = "Product not found" });
             }
 
-            // Fetch the cart based on the UserId
-            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+            
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to view this cart" });
+            }
+
+            // Fetch the cart based on the UserEmail
+            var cart = await _cartCollection.Find(c => c.UserEmail == currentUser.Email).FirstOrDefaultAsync();
 
             if (cart == null)
             {
@@ -160,8 +186,8 @@ namespace EAD_BE.Controllers.User.Order
             return Ok(new { Message = "Item quantity updated successfully" });
         }
         
-        [HttpDelete("update-quantity-remove")]
-        public async Task<IActionResult> UpdateCartItemQuantityRemove(Guid userId, [FromBody] CartItemInput cartItemInput)
+        [HttpDelete("update-quantity-remove/{userEmail}")]
+        public async Task<IActionResult> UpdateCartItemQuantityRemove(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
             if (cartItemInput == null || cartItemInput.ProductId == Guid.Empty || cartItemInput.Quantity <= 0)
             {
@@ -176,8 +202,21 @@ namespace EAD_BE.Controllers.User.Order
                 return NotFound(new { Message = "Product not found" });
             }
 
-            // Fetch the cart based on the UserId
-            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+            
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to view this cart" });
+            }
+
+            // Fetch the cart based on the UserEmail
+            var cart = await _cartCollection.Find(c => c.UserEmail == currentUser.Email).FirstOrDefaultAsync();
 
             if (cart == null)
             {
@@ -214,31 +253,45 @@ namespace EAD_BE.Controllers.User.Order
                 cart.Items.Remove(existingItem);
             }
 
-            // Update the last modified time
-            cart.UpdatedAt = DateTime.UtcNow;
+            // If no items are left in the cart, remove the cart object
+            if (!cart.Items.Any())
+            {
+                await _cartCollection.DeleteOneAsync(c => c.CartUuid == cart.CartUuid);
+            }
+            else
+            {
+                // Update the last modified time
+                cart.UpdatedAt = DateTime.UtcNow;
 
-            // Save the updated cart
-            await _cartCollection.ReplaceOneAsync(
-                c => c.CartUuid == cart.CartUuid,
-                cart,
-                new ReplaceOptions { IsUpsert = true }
-            );
+                // Save the updated cart
+                await _cartCollection.ReplaceOneAsync(
+                    c => c.CartUuid == cart.CartUuid,
+                    cart,
+                    new ReplaceOptions { IsUpsert = true }
+                );
+            }
 
             return Ok(new { Message = "Item quantity updated successfully" });
         }
         
-        [HttpGet("{userId}")]
-        public async Task<IActionResult> GetCartByUserId(Guid userId)
+        [HttpGet("view/{userEmail}")]
+        public async Task<IActionResult> GetCartByUserEmail(string userEmail)
         {
-            // Check if the user exists
-            var userExists = await _userManager.FindByIdAsync(userId.ToString());
-            if (userExists == null)
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
             {
-                return NotFound(new { Message = "User not found" });
+                return Unauthorized(new { Message = "User not logged in" });
             }
 
-            // Fetch the cart based on the UserId
-            var cart = await _cartCollection.Find(c => c.UserId == userId).FirstOrDefaultAsync();
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to view this cart" });
+            }
+
+            // Fetch the cart based on the UserEmail
+            var cart = await _cartCollection.Find(c => c.UserEmail == userEmail).FirstOrDefaultAsync();
 
             if (cart == null)
             {

@@ -10,5 +10,5 @@ public class ProductModel
     public Guid Category { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
-    public Guid AddedByUserId { get; set; }
+    public string AddedByUserEmail { get; set; }
 }
