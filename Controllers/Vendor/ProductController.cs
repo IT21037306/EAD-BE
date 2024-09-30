@@ -33,17 +33,16 @@ namespace EAD_BE.Controllers.Vendor
                 return BadRequest(new { Message = "Product data is required" });
             }
 
-            if (product.AddedByUserId == Guid.Empty)
+            if (string.IsNullOrEmpty(product.AddedByUserEmail))
             {
-                return BadRequest(new { Message = "User ID is required" });
+                return BadRequest(new { Message = "User email is required" });
             }
 
-            var user = await _userManager.FindByIdAsync(product.AddedByUserId.ToString());
+            var user = await _userManager.FindByEmailAsync(product.AddedByUserEmail);
             if (user == null)
             {
                 return BadRequest(new { Message = "User does not exist" });
             }
-            
 
             // Check if the category exists in the database
             var category = await _categoryCollection.Find(c => c.Id == product.Category).FirstOrDefaultAsync();
@@ -69,12 +68,12 @@ namespace EAD_BE.Controllers.Vendor
                 return BadRequest(new { Message = "Product data is required" });
             }
 
-            if (product.AddedByUserId == Guid.Empty)
+            if (string.IsNullOrEmpty(product.AddedByUserEmail))
             {
-                return BadRequest(new { Message = "User ID is required" });
+                return BadRequest(new { Message = "User email is required" });
             }
 
-            var user = await _userManager.FindByIdAsync(product.AddedByUserId.ToString());
+            var user = await _userManager.FindByEmailAsync(product.AddedByUserEmail);
             if (user == null)
             {
                 return BadRequest(new { Message = "User does not exist" });
@@ -86,13 +85,22 @@ namespace EAD_BE.Controllers.Vendor
                 return NotFound(new { Message = "Product not found" });
             }
 
-            existingProduct.Name = product.Name;
-            existingProduct.Description = product.Description;
-            existingProduct.Price = product.Price;
-            existingProduct.StockQuantity = product.StockQuantity;
-            existingProduct.Category = product.Category;
+            var currentUser = await _userManager.GetUserAsync(User);
+            var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            var isVendor = existingProduct.AddedByUserEmail == currentUser.Email;
+
+            if (!isAdmin && !isVendor)
+            {
+                return BadRequest(new { Message = "You do not have permission to update this product" });
+            }
+
+            existingProduct.Name = product.Name ?? existingProduct.Name;
+            existingProduct.Description = product.Description ?? existingProduct.Description;
+            existingProduct.Price = product.Price != default ? product.Price : existingProduct.Price;
+            existingProduct.StockQuantity = product.StockQuantity != default ? product.StockQuantity : existingProduct.StockQuantity;
+            existingProduct.Category = product.Category != default ? product.Category : existingProduct.Category;
             existingProduct.UpdatedAt = DateTime.UtcNow;
-            existingProduct.AddedByUserId = product.AddedByUserId;
+            existingProduct.AddedByUserEmail = product.AddedByUserEmail;
 
             await _context.Products.ReplaceOneAsync(p => p.Id == id, existingProduct);
 
@@ -106,6 +114,15 @@ namespace EAD_BE.Controllers.Vendor
             if (existingProduct == null)
             {
                 return NotFound(new { Message = "Product not found" });
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            var isVendor = existingProduct.AddedByUserEmail == currentUser.Email;
+
+            if (!isAdmin && !isVendor)
+            {
+                return BadRequest(new { Message = "You do not have permission to delete this product" });
             }
 
             await _context.Products.DeleteOneAsync(p => p.Id == id);

@@ -24,12 +24,21 @@ namespace EAD_BE.Controllers.Vendor
             _userManager = userManager;
         }
 
-        [HttpGet("user/{userId}/products")]
-        public async Task<IActionResult> GetUserProducts(Guid userId)
+        [HttpGet("user/{userEmail}/products")]
+        public async Task<IActionResult> GetUserProducts(string userEmail)
         {
             try
             {
-                var products = await _context.Products.Find(p => p.AddedByUserId == userId).ToListAsync();
+                var currentUser = await _userManager.GetUserAsync(User);
+                var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+                var isCurrentUser = currentUser.Email.ToLower() == userEmail.ToLower();
+
+                if (!isAdmin && !isCurrentUser)
+                {
+                    return BadRequest(new { Message = "You do not have permission to view products for this user" });
+                }
+
+                var products = await _context.Products.Find(p => p.AddedByUserEmail.ToLower() == userEmail.ToLower()).ToListAsync();
                 if (products == null || !products.Any())
                 {
                     return NotFound(new { Message = "No products found for the specified user" });
