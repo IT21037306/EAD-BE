@@ -20,7 +20,7 @@ namespace EAD_BE.Models.User.Cart
         public string Id { get; set; } = ObjectId.GenerateNewId().ToString(); // Initialize with a new ObjectId
 
         public Guid CartUuid { get; set; } = Guid.NewGuid(); // Custom UUID for the cart
-        public Guid UserId { get; set; }
+        public String UserEmail { get; set; }
         public List<CartItem> Items { get; set; } = new List<CartItem>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;

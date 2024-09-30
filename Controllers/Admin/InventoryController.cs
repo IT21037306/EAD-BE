@@ -1,6 +1,7 @@
 using EAD_BE.Data;
 using EAD_BE.Models.User.Common;
 using EAD_BE.Models.Vendor.Product;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +10,7 @@ namespace EAD_BE.Controllers.Admin
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize(Roles = "Admin")]
     public class InventoryController : ControllerBase
     {
         private readonly MongoDbContextProduct _context;
@@ -21,7 +23,8 @@ namespace EAD_BE.Controllers.Admin
             _categoryCollection = categoryCollection;
             _userManager = userManager;
         }
-
+        
+        
         [HttpGet("admin/products")]
         public async Task<IActionResult> GetAllUserProducts()
         {
@@ -37,7 +40,7 @@ namespace EAD_BE.Controllers.Admin
 
                 foreach (var user in users)
                 {
-                    var products = await _context.Products.Find(p => p.AddedByUserId == user.Id).ToListAsync();
+                    var products = await _context.Products.Find(p => p.AddedByUserEmail.ToLower() == user.Email.ToLower()).ToListAsync();
                     var userProducts = new Dictionary<string, object>();
 
                     if (products != null && products.Any())
