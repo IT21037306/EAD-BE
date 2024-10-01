@@ -10,7 +10,9 @@ using EAD_BE.Config.User;
 using EAD_BE.Config.Vendor;
 using EAD_BE.Data;
 using EAD_BE.Models.User.Cart;
+using EAD_BE.Models.User.Checkout;
 using EAD_BE.Models.User.Common;
+using EAD_BE.Models.User.Purchased;
 using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -113,6 +115,14 @@ if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
     // Register the Cart collection
     var cartCollection = database.GetCollection<Cart>("Cart");
     builder.Services.AddSingleton(cartCollection);
+    
+    // Register the Checkout collection
+    var checkoutCollection = database.GetCollection<CheckoutModel>("Checkout");
+    builder.Services.AddSingleton(checkoutCollection);
+    
+    // Register the Checkout collection
+    var purchaseCollection = database.GetCollection<PurchaseModel>("Purchase");
+    builder.Services.AddSingleton(purchaseCollection);
 }
 
 
