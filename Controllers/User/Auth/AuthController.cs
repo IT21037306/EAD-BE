@@ -15,7 +15,7 @@ public class AuthController : ControllerBase
     private readonly UserManager<CustomApplicationUser> _userManager;
     private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
     private readonly SignInManager<CustomApplicationUser> _signInManager;
-    private string[] roles = { "Admin", "User", "Vendor", "CSR" };
+    private string[] roles = { "Admin", "User", "CSR" };
 
     public AuthController(UserManager<CustomApplicationUser> userManager, SignInManager<CustomApplicationUser> signInManager)
     {
@@ -29,6 +29,11 @@ public class AuthController : ControllerBase
         if (!ModelState.IsValid)
         {
             return BadRequest(new { Message = "Invalid data provided" });
+        }
+        
+        if (string.IsNullOrEmpty(request.Role))
+        {
+            return BadRequest(new { Message = "Role is required" });
         }
 
         if (!roles.Select(r => r.ToLower()).Contains(request.Role.ToLower()))
@@ -46,7 +51,9 @@ public class AuthController : ControllerBase
         {
             UserName = request.UserName,
             Email = request.Email,
-            State = "inactive"
+            State = "inactive",
+            Address = "",
+            UpdatedAt = DateTime.UtcNow
         };
 
         var result = await _userManager.CreateAsync(user, request.Password);
@@ -61,6 +68,18 @@ public class AuthController : ControllerBase
         }
 
         await _userManager.AddToRoleAsync(user, request.Role);
+
+        if (request.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase))
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "CSR");
+            await _userManager.AddToRoleAsync(user, "Admin");
+            await _userManager.AddToRoleAsync(user, "Vendor");
+        } else if (request.Role.Equals("CSR", StringComparison.OrdinalIgnoreCase))
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+            await _userManager.AddToRoleAsync(user, "CSR");
+        }
 
         // Store the user details as SignUpModel object with default state
         request.State = "inactive";

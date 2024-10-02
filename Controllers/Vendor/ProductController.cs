@@ -1,5 +1,6 @@
 using EAD_BE.Models.Vendor.Product;
 using EAD_BE.Data;
+using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -16,13 +17,15 @@ namespace EAD_BE.Controllers.Vendor
         private readonly MongoDbContextProduct _context;
         private readonly UserManager<CustomApplicationUser> _userManager;
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
+        private readonly IMongoCollection<Cart> _cartCollection;
         
 
-        public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager, IMongoCollection<CategoryModel> categoryCollection)
+        public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager, IMongoCollection<CategoryModel> categoryCollection, IMongoCollection<Cart> cartCollection)
         {
             _context = context;
             _userManager = userManager;
             _categoryCollection = categoryCollection;
+            _cartCollection = cartCollection;
         }
 
         [HttpPost("add-product")]
@@ -125,10 +128,20 @@ namespace EAD_BE.Controllers.Vendor
                 return BadRequest(new { Message = "You do not have permission to delete this product" });
             }
 
+            // Check if the product exists in any cart's items array
+            var productInCart = await _cartCollection.Find(c => c.Items.Any(i => i.ProductId == id)).FirstOrDefaultAsync();
+            if (productInCart != null)
+            {
+                return BadRequest(new { Message = "Product exists in a cart and cannot be deleted" });
+            }
+
             await _context.Products.DeleteOneAsync(p => p.Id == id);
 
             return Ok(new { Message = "Product deleted successfully" });
         }
         
+        
     }
+    
+    
 }
