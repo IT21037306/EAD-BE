@@ -12,7 +12,7 @@ namespace EAD_BE.Controllers.CSR.Purchase
 
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize (Roles = "CSR,Admin")]
+    [Authorize (Roles = "CSR,Admin,Vendor")]
     public class PurchaseController : ControllerBase
     {
         private readonly IMongoCollection<PurchaseModel> _purchaseCollection;

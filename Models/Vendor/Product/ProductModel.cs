@@ -11,4 +11,21 @@ public class ProductModel
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
     public string AddedByUserEmail { get; set; }
+
+    public int Ranking { get; set; } = 0;
+    
+    public int RankingCount { get; set; } = 0;
+    
+    public List<Comment> Comments { get; set; } = new List<Comment>();
+
+}
+
+public class Comment
+{
+    public Guid commentID { get; set; }
+    public string UserEmail { get; set; }
+    public string Text { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 }

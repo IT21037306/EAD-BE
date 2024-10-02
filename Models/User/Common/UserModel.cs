@@ -8,4 +8,8 @@ using System;
 public class CustomApplicationUser : MongoIdentityUser<Guid>
 {
     public string State { get; set; } = "inactive";
+        
+    public string Address { get; set; }
+    
+    public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 }

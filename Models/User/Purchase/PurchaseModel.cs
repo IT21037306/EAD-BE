@@ -8,6 +8,13 @@ public class PurchaseModel
     public List<PurchasedItem> Items { get; set; }
     public bool IsShipped { get; set; } = false;
     public bool IsDelivered { get; set; } = false;
+    
+    public bool IsUserDataAvailable { get; set; } = false;
+    
+    public UserData UserDetails { get; set; }
+    
+    public bool isOrderCancelled { get; set; } = false;
+    
 }
 
 public class PurchasedItem
@@ -16,4 +23,11 @@ public class PurchasedItem
     public string ProductName { get; set; }
     public decimal Price { get; set; }
     public int Quantity { get; set; }
+}
+
+public class UserData
+{
+    public string UserName { get; set; }
+    public string UserPhoneNumber { get; set; }
+    public string UserAddress { get; set; }
 }
