@@ -84,5 +84,23 @@ namespace EAD_BE.Controllers.Admin.Vendor
 
         return Ok(new { Message = "Vendor created successfully" });
     }
+    
+        [HttpDelete("delete-vendor/{email}")]
+        public async Task<IActionResult> DeleteVendor(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound(new { Message = "Vendor not found" });
+            }
+
+            var result = await _userManager.DeleteAsync(user);
+            if (!result.Succeeded)
+            {
+                return StatusCode(500, new { Message = "An error occurred while deleting the vendor" });
+            }
+
+            return Ok(new { Message = "Vendor deleted successfully" });
+        }
     }
 }
