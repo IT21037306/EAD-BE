@@ -10,7 +10,7 @@ namespace EAD_BE.Controllers.User.Order
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize (Roles = "User,Admin,Vendor,CSR")]
+    [Authorize (Roles = "User,Admin,CSR")]
     public class CartController : ControllerBase
     {
         private readonly IMongoCollection<Cart> _cartCollection;
