@@ -104,6 +104,8 @@ namespace EAD_BE.Controllers.Vendor
             existingProduct.Category = product.Category != default ? product.Category : existingProduct.Category;
             existingProduct.UpdatedAt = DateTime.UtcNow;
             existingProduct.AddedByUserEmail = product.AddedByUserEmail;
+            existingProduct.ProductPicture = product.ProductPicture ?? existingProduct.ProductPicture;
+
 
             await _context.Products.ReplaceOneAsync(p => p.Id == id, existingProduct);
 

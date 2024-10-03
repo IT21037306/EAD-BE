@@ -17,6 +17,8 @@ public class ProductModel
     public int RankingCount { get; set; } = 0;
     
     public List<Comment> Comments { get; set; } = new List<Comment>();
+    
+    public string ProductPicture { get; set; }
 
 }
 
