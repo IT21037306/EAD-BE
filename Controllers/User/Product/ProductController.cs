@@ -52,7 +52,8 @@ public class ProductController : ControllerBase
                         Category = new { category.Id, category.Name },
                         product.CreatedAt,
                         product.UpdatedAt,
-                        AddedByUserEmail = product.AddedByUserEmail
+                        product.AddedByUserEmail,
+                        product.ProductPicture
                     });
                 }
             }
