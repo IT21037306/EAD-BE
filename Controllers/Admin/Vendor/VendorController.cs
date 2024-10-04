@@ -102,5 +102,24 @@ namespace EAD_BE.Controllers.Admin.Vendor
 
             return Ok(new { Message = "Vendor deleted successfully" });
         }
+        
+        [HttpGet("all-vendors")]
+        public async Task<IActionResult> GetAllVendors()
+        {
+            try
+            {
+                var vendors = await _userManager.GetUsersInRoleAsync("Vendor");
+                if (vendors == null || vendors.Count == 0)
+                {
+                    return NotFound(new { Message = "No vendors found" });
+                }
+
+                return Ok(vendors);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while retrieving vendors", Details = ex.Message });
+            }
+        }
     }
 }
