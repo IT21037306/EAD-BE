@@ -79,5 +79,32 @@ namespace EAD_BE.Controllers.User.UserManagement
 
             return Ok(new { Message = "User account updated successfully" });
         }
+        
+        [HttpPut("deactivate-account/{email}")]
+        public async Task<IActionResult> DeactivateAccount(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return NotFound(new { Message = "User not found" });
+            }
+
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null || currentUser.Email != email)
+            {
+                return Unauthorized(new { Message = "You are not authorized to deactivate this account" });
+            }
+
+            user.State = "inactive";
+            user.UpdatedAt = DateTime.UtcNow;
+
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                return BadRequest(new { Message = "Failed to deactivate user account", Errors = result.Errors });
+            }
+
+            return Ok(new { Message = "User account deactivated successfully" });
+        }
     }
 }
