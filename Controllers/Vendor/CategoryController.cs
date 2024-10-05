@@ -20,23 +20,6 @@ namespace EAD_BE.Controllers.Vendor
             _categoryCollection = categoryCollection;
             _userManager = userManager;
         }
-
-        [HttpPut("update-category-status/{id}")]
-        public async Task<IActionResult> UpdateCategoryStatus(Guid id)
-        {
-            var category = await _categoryCollection.Find(c => c.Id == id).FirstOrDefaultAsync();
-            if (category == null)
-            {
-                return NotFound(new { Message = "Category not found" });
-            }
-
-            // Toggle the IsActive state
-            var newIsActiveState = !category.IsActive;
-            var update = Builders<CategoryModel>.Update.Set(c => c.IsActive, newIsActiveState);
-            await _categoryCollection.UpdateOneAsync(c => c.Id == id, update);
-
-            return Ok(new { Message = "Category status updated successfully", IsActive = newIsActiveState });
-        }
         
         [HttpGet("all-categories/{userEmail}")]
         public async Task<IActionResult> GetAllCategories(String userEmail)
