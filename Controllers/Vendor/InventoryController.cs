@@ -30,10 +30,9 @@ namespace EAD_BE.Controllers.Vendor
             try
             {
                 var currentUser = await _userManager.GetUserAsync(User);
-                var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
                 var isCurrentUser = currentUser.Email.ToLower() == userEmail.ToLower();
 
-                if (!isAdmin && !isCurrentUser)
+                if (!isCurrentUser)
                 {
                     return BadRequest(new { Message = "You do not have permission to view products for this user" });
                 }
@@ -61,7 +60,20 @@ namespace EAD_BE.Controllers.Vendor
                         };
                     }
 
-                    ((List<object>)((dynamic)userProducts[categoryName]).products).Add(new
+                    if (product.StockQuantity <= 10)
+                    {
+                        product.Notification = new Notification
+                        {
+                            Message = $"The stock for product '{product.Name}' is low. Current stock quantity is {product.StockQuantity}.",
+                            currentStock = product.StockQuantity,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        // Save the product to the database
+                        //await _context.Products.ReplaceOneAsync(p => p.Id == product.Id, product, new ReplaceOptions { IsUpsert = true });
+                    }
+
+                    var productDetails = new
                     {
                         product.Id,
                         product.Name,
@@ -70,8 +82,11 @@ namespace EAD_BE.Controllers.Vendor
                         product.StockQuantity,
                         Category = category != null ? new { category.Id, category.Name } : null,
                         product.CreatedAt,
-                        product.UpdatedAt
-                    });
+                        product.UpdatedAt,
+                        product.Notification
+                    };
+
+                    ((List<object>)((dynamic)userProducts[categoryName]).products).Add(productDetails);
                 }
 
                 return Ok(userProducts);
@@ -81,6 +96,5 @@ namespace EAD_BE.Controllers.Vendor
                 return StatusCode(500, new { Message = "An error occurred while retrieving products", Details = ex.Message });
             }
         }
-        
     }
 }

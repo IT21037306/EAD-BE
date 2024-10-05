@@ -19,7 +19,16 @@ public class ProductModel
     public List<Comment> Comments { get; set; } = new List<Comment>();
     
     public string ProductPicture { get; set; }
+    
+    public Notification? Notification { get; set; }
 
+}
+
+public class Notification
+{
+    public string Message { get; set; }
+    public int currentStock { get; set; }
+    public DateTime CreatedAt { get; set; }
 }
 
 public class Comment
