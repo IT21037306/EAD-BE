@@ -9,7 +9,7 @@ namespace EAD_BE.Controllers.Admin
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize(Roles = "Vendor,Admin")]
+    [Authorize(Roles = "Admin")]
     public class CategoryController : ControllerBase
     {
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
