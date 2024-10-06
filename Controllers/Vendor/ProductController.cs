@@ -35,6 +35,39 @@ namespace EAD_BE.Controllers.Vendor
             {
                 return BadRequest(new { Message = "Product data is required" });
             }
+            
+            if (string.IsNullOrEmpty(product.Name))
+            {
+                return BadRequest(new{Message = "Product name is required"});
+            }
+
+            if (string.IsNullOrEmpty(product.Description))
+            {
+                return BadRequest(new{Message = "Product description is required"});
+            }
+            
+            if (string.IsNullOrEmpty(product.ProductPicture))
+            {
+                return BadRequest(new{Message = "Product picture is required"});
+            }
+            
+            if (product.Price == default)
+            {
+                return BadRequest(new{Message = "Product price is required"});
+            }
+            
+            if (product.StockQuantity == default)
+            {
+                return BadRequest(new{Message = "Product stock quantity is required"});
+            }
+            
+            if (product.Category == default)
+            {
+                return BadRequest(new{Message = "Product category is required"});
+            }
+            
+            
+
 
             if (string.IsNullOrEmpty(product.AddedByUserEmail))
             {
@@ -69,21 +102,6 @@ namespace EAD_BE.Controllers.Vendor
             if (product == null)
             {
                 return BadRequest(new { Message = "Product data is required" });
-            }
-
-            if (string.IsNullOrEmpty(product.Name))
-            {
-                return BadRequest(new{Message = "Product name is required"});
-            }
-
-            if (string.IsNullOrEmpty(product.Description))
-            {
-                return BadRequest(new{Message = "Product description is required"});
-            }
-            
-            if (string.IsNullOrEmpty(product.ProductPicture))
-            {
-                return BadRequest(new{Message = "Product picture is required"});
             }
 
             if (string.IsNullOrEmpty(product.AddedByUserEmail))
