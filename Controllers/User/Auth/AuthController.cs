@@ -160,4 +160,11 @@ public class AuthController : ControllerBase
 
         return Ok(new { Message = "Login successful", Token = tokenString, User = userDto });
     }
+    
+    [HttpPost("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return Ok(new { Message = "Logout successful" });
+    }
 }
