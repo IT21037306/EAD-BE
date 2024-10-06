@@ -32,6 +32,16 @@ namespace EAD_BE.Controllers.Admin.Vendor
         {
             return BadRequest(new { Message = "Invalid data provided" });
         }
+
+        if (string.IsNullOrEmpty(request.Address))
+        {
+            return BadRequest(new { Message = "Address is required" });
+        }
+        
+        if (string.IsNullOrEmpty(request.PhoneNumber))
+        {
+            return BadRequest(new { Message = "Phone number is required" });
+        }
         
         var existingUser = await _userManager.FindByEmailAsync(request.Email);
         if (existingUser != null)
