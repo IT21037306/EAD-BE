@@ -15,6 +15,8 @@ public class PurchaseModel
     
     public bool isOrderCancelled { get; set; } = false;
     
+    public bool requestToCancelOrder { get; set; } = false;
+    
 }
 
 public class PurchasedItem
