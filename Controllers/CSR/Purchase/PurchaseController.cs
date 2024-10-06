@@ -99,5 +99,39 @@ namespace EAD_BE.Controllers.CSR.Purchase
 
             return Ok(new { Message = "Order cancelled successfully" });
         }
+        
+        [HttpGet("view-orders-requested-to-cancel/{userEmail}")]
+        public async Task<IActionResult> GetAllOrdersRequestedToCancel(String userEmail)
+        {
+            try
+            {
+                // Fetch the current logged-in user
+                var currentUser = await _userManager.GetUserAsync(User);
+                if (currentUser == null)
+                {
+                    return Unauthorized(new { Message = "User not logged in" });
+                }
+
+                // Check if the email matches the logged-in user's email
+                if (currentUser.Email != userEmail)
+                {
+                    return BadRequest(new { Message = "You are not authorized to update this purchase" });
+                }
+                
+                var filter = Builders<PurchaseModel>.Filter.Eq(p => p.requestToCancelOrder, true);
+                var orders = await _purchaseCollection.Find(filter).ToListAsync();
+
+                if (orders == null || !orders.Any())
+                {
+                    return NotFound(new { Message = "No orders found with cancel requests" });
+                }
+
+                return Ok(orders);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { Message = "An error occurred while retrieving orders", Details = ex.Message });
+            }
+        }
     }
 }
