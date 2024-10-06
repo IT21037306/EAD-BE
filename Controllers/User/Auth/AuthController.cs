@@ -30,6 +30,11 @@ public class AuthController : ControllerBase
         {
             return BadRequest(new { Message = "Invalid data provided" });
         }
+
+        if (request.Role == null)
+        {
+            request.Role = "User";
+        }
         
         if (string.IsNullOrEmpty(request.Role))
         {
@@ -51,7 +56,7 @@ public class AuthController : ControllerBase
         {
             UserName = request.UserName,
             Email = request.Email,
-            State = "inactive",
+            State = request.Role != null && (request.Role.Equals("Admin", StringComparison.OrdinalIgnoreCase) || request.Role.Equals("CSR", StringComparison.OrdinalIgnoreCase)) ? "active" : "inactive",
             Address = "",
             UpdatedAt = DateTime.UtcNow
         };
@@ -75,14 +80,20 @@ public class AuthController : ControllerBase
             await _userManager.AddToRoleAsync(user, "CSR");
             await _userManager.AddToRoleAsync(user, "Admin");
             await _userManager.AddToRoleAsync(user, "Vendor");
+
+            
         } else if (request.Role.Equals("CSR", StringComparison.OrdinalIgnoreCase))
         {
             await _userManager.AddToRoleAsync(user, "User");
             await _userManager.AddToRoleAsync(user, "CSR");
+
+        }else if (request.Role == null)
+        {
+            await _userManager.AddToRoleAsync(user, "User");
+
         }
 
         // Store the user details as SignUpModel object with default state
-        request.State = "inactive";
         _signUpModels.Add(request);
 
         return Ok(new { Message = "User created successfully" });

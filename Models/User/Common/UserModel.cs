@@ -7,7 +7,7 @@ using System;
 [CollectionName("Users")]
 public class CustomApplicationUser : MongoIdentityUser<Guid>
 {
-    public string State { get; set; } = "inactive";
+    public string State { get; set; }
         
     public string Address { get; set; }
     
