@@ -71,6 +71,21 @@ namespace EAD_BE.Controllers.Vendor
                 return BadRequest(new { Message = "Product data is required" });
             }
 
+            if (string.IsNullOrEmpty(product.Name))
+            {
+                return BadRequest(new{Message = "Product name is required"});
+            }
+
+            if (string.IsNullOrEmpty(product.Description))
+            {
+                return BadRequest(new{Message = "Product description is required"});
+            }
+            
+            if (string.IsNullOrEmpty(product.ProductPicture))
+            {
+                return BadRequest(new{Message = "Product picture is required"});
+            }
+
             if (string.IsNullOrEmpty(product.AddedByUserEmail))
             {
                 return BadRequest(new { Message = "User email is required" });
@@ -97,14 +112,14 @@ namespace EAD_BE.Controllers.Vendor
                 return BadRequest(new { Message = "You do not have permission to update this product" });
             }
 
-            existingProduct.Name = product.Name ?? existingProduct.Name;
-            existingProduct.Description = product.Description ?? existingProduct.Description;
+            existingProduct.Name = product.Name != default ? product.Name : existingProduct.Name;
+            existingProduct.Description = product.Description != default ? product.Description : existingProduct.Description;
             existingProduct.Price = product.Price != default ? product.Price : existingProduct.Price;
             existingProduct.StockQuantity = product.StockQuantity != default ? product.StockQuantity : existingProduct.StockQuantity;
             existingProduct.Category = product.Category != default ? product.Category : existingProduct.Category;
             existingProduct.UpdatedAt = DateTime.UtcNow;
             existingProduct.AddedByUserEmail = product.AddedByUserEmail;
-            existingProduct.ProductPicture = product.ProductPicture ?? existingProduct.ProductPicture;
+            existingProduct.ProductPicture = product.ProductPicture != default ? product.ProductPicture : existingProduct.ProductPicture; ;
 
 
             await _context.Products.ReplaceOneAsync(p => p.Id == id, existingProduct);

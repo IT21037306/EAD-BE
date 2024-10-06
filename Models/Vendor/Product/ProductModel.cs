@@ -3,8 +3,8 @@ namespace EAD_BE.Models.Vendor.Product;
 public class ProductModel
 {
     public Guid Id { get; set; }
-    public string Name { get; set; }
-    public string Description { get; set; }
+    public string? Name { get; set; }
+    public string? Description { get; set; }
     public decimal Price { get; set; }
     public int StockQuantity { get; set; }
     public Guid Category { get; set; }
@@ -18,7 +18,7 @@ public class ProductModel
     
     public List<Comment> Comments { get; set; } = new List<Comment>();
     
-    public string ProductPicture { get; set; }
+    public string? ProductPicture { get; set; }
     
     public Notification? Notification { get; set; }
 
