@@ -57,5 +57,47 @@ namespace EAD_BE.Controllers.CSR.Purchase
 
             return Ok(new { Message = "Shipping status updated to true successfully" });
         }
+        
+        [HttpPatch ("cancel-order/{purchaseId}")]
+        public async Task<IActionResult> CancelOrder(Guid purchaseId)
+        {
+            var purchase = await _purchaseCollection.Find(p => p.PurchaseId == purchaseId).FirstOrDefaultAsync();
+            if (purchase == null)
+            {
+                return NotFound(new { Message = "Purchase record not found" });
+            }
+
+            if (purchase.IsShipped)
+            {
+                return BadRequest(new { Message = "Order cannot be cancelled after shipping" });
+            }
+
+            if (purchase.IsDelivered)
+            {
+                return BadRequest(new { Message = "Order cannot be cancelled after delivery" });
+            }
+
+            if (purchase.requestToCancelOrder)
+            {
+                return BadRequest(new { Message = "Order is already requested to cancel" });
+            }
+
+            if (purchase.isOrderCancelled)
+            {
+                return BadRequest(new { Message = "Order is already cancelled" });
+            }
+
+            var filter = Builders<PurchaseModel>.Filter.Eq(p => p.PurchaseId, purchaseId);
+            var update = Builders<PurchaseModel>.Update.Set(p => p.isOrderCancelled, true);
+
+            var result = await _purchaseCollection.UpdateOneAsync(filter, update);
+
+            if (result.ModifiedCount == 0)
+            {
+                return NotFound(new { Message = "Purchase record not found or order cancellation unchanged" });
+            }
+
+            return Ok(new { Message = "Order cancelled successfully" });
+        }
     }
 }

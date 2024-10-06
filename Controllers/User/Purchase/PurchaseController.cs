@@ -228,7 +228,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
             return Ok(new { Message = "User details updated successfully" });
         }
         
-        [HttpPatch ("cancel-order/{purchaseId}")]
+        [HttpPatch ("request-cancel-order/{purchaseId}")]
         public async Task<IActionResult> CancelOrder(Guid purchaseId)
         {
             var purchase = await _purchaseCollection.Find(p => p.PurchaseId == purchaseId).FirstOrDefaultAsync();
@@ -239,12 +239,17 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
 
             if (purchase.IsShipped)
             {
-                return BadRequest(new { Message = "Order cannot be cancelled after shipping" });
+                return BadRequest(new { Message = "Order cancel request can't be made after shipping" });
             }
 
             if (purchase.IsDelivered)
             {
-                return BadRequest(new { Message = "Order cannot be cancelled after delivery" });
+                return BadRequest(new { Message = "Order cancel request can't be made after delivery" });
+            }
+
+            if (purchase.requestToCancelOrder)
+            {
+                return BadRequest(new { Message = "Order is already requested to cancel" });
             }
 
             if (purchase.isOrderCancelled)
@@ -253,7 +258,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
             }
 
             var filter = Builders<PurchaseModel>.Filter.Eq(p => p.PurchaseId, purchaseId);
-            var update = Builders<PurchaseModel>.Update.Set(p => p.isOrderCancelled, true);
+            var update = Builders<PurchaseModel>.Update.Set(p => p.requestToCancelOrder, true);
 
             var result = await _purchaseCollection.UpdateOneAsync(filter, update);
 
@@ -262,7 +267,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
                 return NotFound(new { Message = "Purchase record not found or order cancellation unchanged" });
             }
 
-            return Ok(new { Message = "Order cancelled successfully" });
+            return Ok(new { Message = "Order cancel request has been made successfully" });
         }
         
         
