@@ -29,9 +29,7 @@ namespace EAD_BE.Models.User.Checkout
         public string UserEmail { get; set; }
         public List<CheckoutItem> Items { get; set; } = new List<CheckoutItem>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-
-        // properties for purchase and payment status
-        public string PurchaseStatus { get; set; } = "Pending"; // Default status
-        public string PaymentStatus { get; set; } = "Pending"; // Default status
+        public string PurchaseStatus { get; set; } = "Pending"; 
+        public string PaymentStatus { get; set; } = "Pending"; 
     }
 }
