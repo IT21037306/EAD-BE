@@ -22,12 +22,14 @@ namespace EAD_BE.Controllers.Vendor
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public CategoryController(IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
         {
             _categoryCollection = categoryCollection;
             _userManager = userManager;
         }
         
+        // Display All Categories
         [HttpGet("all-categories/{userEmail}")]
         public async Task<IActionResult> GetAllCategories(String userEmail)
         {

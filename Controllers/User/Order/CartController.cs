@@ -24,6 +24,7 @@ namespace EAD_BE.Controllers.User.Order
         private readonly MongoDbContextProduct _context;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public CartController(IMongoCollection<Cart> cartCollection , MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager)
         {
             _cartCollection = cartCollection;
@@ -31,6 +32,7 @@ namespace EAD_BE.Controllers.User.Order
             _userManager = userManager;
         }  
 
+        // Add Item to Cart
         [HttpPost("add/{userEmail}")]
         public async Task<IActionResult> AddToCart(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
@@ -119,6 +121,7 @@ namespace EAD_BE.Controllers.User.Order
             return Ok(new { Message = "Item added to cart successfully" });
         }
         
+        // Update Item Quantity in Cart (Add Items)
         [HttpPut("update-quantity-add/{userEmail}")]
         public async Task<IActionResult> UpdateCartItemQuantityAdd(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
@@ -193,6 +196,7 @@ namespace EAD_BE.Controllers.User.Order
             return Ok(new { Message = "Item quantity updated successfully" });
         }
         
+        // Update Item Quantity in Cart (Deduct Items)
         [HttpDelete("update-quantity-remove/{userEmail}")]
         public async Task<IActionResult> UpdateCartItemQuantityRemove(String userEmail, [FromBody] CartItemInput cartItemInput)
         {
@@ -281,6 +285,7 @@ namespace EAD_BE.Controllers.User.Order
             return Ok(new { Message = "Item quantity updated successfully" });
         }
         
+        // Display Cart
         [HttpGet("view/{userEmail}")]
         public async Task<IActionResult> GetCartByUserEmail(string userEmail)
         {

@@ -24,6 +24,7 @@ public class ProductController : ControllerBase
     private readonly IMongoCollection<CategoryModel> _categoryCollection;
     private readonly UserManager<CustomApplicationUser> _userManager;
 
+    // Constructor
     public ProductController(MongoDbContextProduct context , IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
     {
         _context = context;
@@ -31,6 +32,7 @@ public class ProductController : ControllerBase
         _userManager = userManager;
     }
 
+    // Display All Products
     [HttpGet("all-products")]
     public async Task<IActionResult> GetAllProducts()
     {
@@ -78,7 +80,8 @@ public class ProductController : ControllerBase
         }
     }
     
-            [HttpPost("rate-product/{productId}")]
+        // Rate a product
+        [HttpPost("rate-product/{productId}")]
         public async Task<IActionResult> RateProduct(Guid productId, [FromBody] int rating)
         {
             if (rating < 1 || rating > 5)
@@ -101,6 +104,7 @@ public class ProductController : ControllerBase
             return Ok(new { Message = "Product rated successfully" });
         }
         
+        // Add a comment to a product
         [HttpPost("add-comment/{productId}")]
         public async Task<IActionResult> AddComment(Guid productId, [FromBody] Comment comment)
         {
@@ -144,6 +148,7 @@ public class ProductController : ControllerBase
             return Ok(new { Message = "Comment added successfully" });
         }
         
+        // Update a comment
         [HttpPut("update-comment/{productId}")]
         public async Task<IActionResult> UpdateComment(Guid productId, Guid commentId,[FromBody] Comment updatedComment)
         {
@@ -183,7 +188,7 @@ public class ProductController : ControllerBase
 
             return Ok(new { Message = "Comment updated successfully" });
         }
-        
+        // Delete a comment
         [HttpDelete("delete-comment/{productId}/{commentId}/{userEmail}")]
         public async Task<IActionResult> DeleteComment(Guid productId, Guid commentId, string userEmail)
         {

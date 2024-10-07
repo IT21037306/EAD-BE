@@ -27,81 +27,84 @@ namespace EAD_BE.Controllers.Admin.Vendor
         private string phoneNumber;
         
 
+        // Constructor
         public VendorController( UserManager<CustomApplicationUser> userManager)
         {
             _userManager = userManager;
         }
         
+        // Create Vendor
         [HttpPost("create-vendor")]    
-    public async Task<IActionResult> Signup([FromBody] SignUpModel request)
-    {
-        if (!ModelState.IsValid)
+        public async Task<IActionResult> Signup([FromBody] SignUpModel request)
         {
-            return BadRequest(new { Message = "Invalid data provided" });
-        }
-
-        if (string.IsNullOrEmpty(request.Address))
-        {
-            return BadRequest(new { Message = "Address is required" });
-        }
-        
-        if (string.IsNullOrEmpty(request.PhoneNumber))
-        {
-            return BadRequest(new { Message = "Phone number is required" });
-        }
-        
-        var existingUser = await _userManager.FindByEmailAsync(request.Email);
-        if (existingUser != null)
-        {
-            return BadRequest(new { Message = "Email is already in use" });
-        }
-        
-        var user = new CustomApplicationUser
-        {
-            UserName = request.UserName,
-            Email = request.Email,
-            State = "active",
-            Address = "",
-            UpdatedAt = DateTime.UtcNow
-        };
-        
-        if (!string.IsNullOrEmpty(request.PhoneNumber))
-        {
-            if (request.PhoneNumber.Length != 10)
+            if (!ModelState.IsValid)
             {
-                return BadRequest(new { Message = "Phone number must be exactly 10 digits long" });
+                return BadRequest(new { Message = "Invalid data provided" });
             }
-                
-            user.PhoneNumber = request.PhoneNumber;
-        }
 
-        if (!string.IsNullOrEmpty(request.Address))
-        {
-            user.Address = request.Address;
-        }
-
-
-
-        var result = await _userManager.CreateAsync(user, request.Password);
-
-        if (!result.Succeeded)
-        {
-            foreach (var error in result.Errors)
+            if (string.IsNullOrEmpty(request.Address))
             {
-                ModelState.AddModelError(error.Code, error.Description);
+                return BadRequest(new { Message = "Address is required" });
             }
-            return BadRequest(new { Message = "User creation failed", Errors = ModelState });
+            
+            if (string.IsNullOrEmpty(request.PhoneNumber))
+            {
+                return BadRequest(new { Message = "Phone number is required" });
+            }
+            
+            var existingUser = await _userManager.FindByEmailAsync(request.Email);
+            if (existingUser != null)
+            {
+                return BadRequest(new { Message = "Email is already in use" });
+            }
+            
+            var user = new CustomApplicationUser
+            {
+                UserName = request.UserName,
+                Email = request.Email,
+                State = "active",
+                Address = "",
+                UpdatedAt = DateTime.UtcNow
+            };
+            
+            if (!string.IsNullOrEmpty(request.PhoneNumber))
+            {
+                if (request.PhoneNumber.Length != 10)
+                {
+                    return BadRequest(new { Message = "Phone number must be exactly 10 digits long" });
+                }
+                    
+                user.PhoneNumber = request.PhoneNumber;
+            }
+
+            if (!string.IsNullOrEmpty(request.Address))
+            {
+                user.Address = request.Address;
+            }
+
+
+
+            var result = await _userManager.CreateAsync(user, request.Password);
+
+            if (!result.Succeeded)
+            {
+                foreach (var error in result.Errors)
+                {
+                    ModelState.AddModelError(error.Code, error.Description);
+                }
+                return BadRequest(new { Message = "User creation failed", Errors = ModelState });
+            }
+
+            await _userManager.AddToRoleAsync(user, "Vendor");
+            await _userManager.AddToRoleAsync(user, "User");
+
+            // Store the user details as SignUpModel object
+            _signUpModels.Add(request);
+
+            return Ok(new { Message = "Vendor created successfully" });
         }
-
-        await _userManager.AddToRoleAsync(user, "Vendor");
-        await _userManager.AddToRoleAsync(user, "User");
-
-        // Store the user details as SignUpModel object
-        _signUpModels.Add(request);
-
-        return Ok(new { Message = "Vendor created successfully" });
-    }
     
+        // Delete Vendor
         [HttpDelete("delete-vendor/{email}")]
         public async Task<IActionResult> DeleteVendor(string email)
         {
@@ -120,6 +123,7 @@ namespace EAD_BE.Controllers.Admin.Vendor
             return Ok(new { Message = "Vendor deleted successfully" });
         }
         
+        // Display All Vendors
         [HttpGet("all-vendors")]
         public async Task<IActionResult> GetAllVendors()
         {

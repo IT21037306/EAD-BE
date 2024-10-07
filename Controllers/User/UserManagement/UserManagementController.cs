@@ -21,11 +21,13 @@ namespace EAD_BE.Controllers.User.UserManagement
     {
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public UserManagementController(UserManager<CustomApplicationUser>  userManager)
         {
             _userManager = userManager;
         }
 
+        // Update User Account
         [HttpPut("update-account")]
         public async Task<IActionResult> UpdateUserAccount([FromBody] UpdateUserModel model)
         {
@@ -87,6 +89,7 @@ namespace EAD_BE.Controllers.User.UserManagement
             return Ok(new { Message = "User account updated successfully" });
         }
         
+        // Deactivate User Account
         [HttpPut("deactivate-account/{email}")]
         public async Task<IActionResult> DeactivateAccount(string email)
         {

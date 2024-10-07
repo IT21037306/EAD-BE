@@ -25,12 +25,14 @@ namespace EAD_BE.Controllers.CSR.Purchase
         private readonly IMongoCollection<PurchaseModel> _purchaseCollection;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, UserManager<CustomApplicationUser> userManager)
         {
             _purchaseCollection = purchaseCollection;
             _userManager = userManager;
         }
 
+        // Update Shipping Status of a Purchase
         [HttpPut("update-shipping-status/{purchaseId}/{userEmail}")]
         public async Task<IActionResult> UpdateShippingStatus(Guid purchaseId, string userEmail)
         {
@@ -65,6 +67,7 @@ namespace EAD_BE.Controllers.CSR.Purchase
             return Ok(new { Message = "Shipping status updated to true successfully" });
         }
         
+        // Cancel an order before dispatch
         [HttpPatch ("cancel-order/{purchaseId}")]
         public async Task<IActionResult> CancelOrder(Guid purchaseId)
         {
@@ -107,6 +110,7 @@ namespace EAD_BE.Controllers.CSR.Purchase
             return Ok(new { Message = "Order cancelled successfully" });
         }
         
+        // View all orders requested to cancel
         [HttpGet("view-orders-requested-to-cancel/{userEmail}")]
         public async Task<IActionResult> GetAllOrdersRequestedToCancel(String userEmail)
         {

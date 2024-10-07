@@ -27,6 +27,7 @@ namespace EAD_BE.Controllers.Vendor
         private readonly IMongoCollection<Cart> _cartCollection;
         
 
+        // Constructor
         public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager, IMongoCollection<CategoryModel> categoryCollection, IMongoCollection<Cart> cartCollection)
         {
             _context = context;
@@ -35,6 +36,7 @@ namespace EAD_BE.Controllers.Vendor
             _cartCollection = cartCollection;
         }
 
+        // Add a new product
         [HttpPost("add-product")]
         public async Task<IActionResult> AddProduct([FromBody] ProductModel product)
         {
@@ -72,9 +74,6 @@ namespace EAD_BE.Controllers.Vendor
             {
                 return BadRequest(new{Message = "Product category is required"});
             }
-            
-            
-
 
             if (string.IsNullOrEmpty(product.AddedByUserEmail))
             {
@@ -103,6 +102,7 @@ namespace EAD_BE.Controllers.Vendor
             return Ok(new { Message = "Product added successfully", ProductId = product.Id });
         }
         
+        // Update an existing product
         [HttpPut("update-product/{id}")]
         public async Task<IActionResult> UpdateProduct(Guid id, [FromBody] ProductModel product)
         {
@@ -152,6 +152,7 @@ namespace EAD_BE.Controllers.Vendor
             return Ok(new { Message = "Product updated successfully", ProductId = existingProduct.Id });
         }
         
+        // Delete an existing product
         [HttpDelete("delete-product/{id}")]
         public async Task<IActionResult> DeleteProduct(Guid id)
         {

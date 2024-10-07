@@ -24,6 +24,7 @@ namespace EAD_BE.Controllers.Vendor
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public InventoryController(MongoDbContextProduct context, IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
         {
             _context = context;
@@ -31,6 +32,7 @@ namespace EAD_BE.Controllers.Vendor
             _userManager = userManager;
         }
 
+        // Display All Products of a Vendor
         [HttpGet("user/{userEmail}/products")]
         public async Task<IActionResult> GetUserProducts(string userEmail)
         {

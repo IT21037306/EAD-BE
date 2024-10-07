@@ -26,6 +26,7 @@ namespace EAD_BE.Controllers.User.Purchase
         private readonly UserManager<CustomApplicationUser> _userManager;
         private readonly MongoDbContextProduct _productCollection;
 
+        // Constructor
         public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomApplicationUser> userManager, MongoDbContextProduct productCollection)
         {
             _purchaseCollection = purchaseCollection;
@@ -34,72 +35,73 @@ namespace EAD_BE.Controllers.User.Purchase
             _productCollection = productCollection;
         }
 
+        // Add Checkout items to Purchase Table
         [HttpPost("add-to-purchase/{checkoutUuid}/{userEmail}")]
-public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string userEmail)
-{
-    // Fetch the current logged-in user
-    var currentUser = await _userManager.GetUserAsync(User);
-    if (currentUser == null)
-    {
-        return Unauthorized(new { Message = "User not logged in" });
-    }
-
-    // Check if the email matches the logged-in user's email
-    if (currentUser.Email != userEmail)
-    {
-        return BadRequest(new { Message = "You are not authorized to add this checkout to purchase table" });
-    }
-
-    // Fetch the checkout record based on the CheckoutUuid and UserEmail
-    var checkout = await _checkoutCollection.Find(c => c.CheckoutUuid == checkoutUuid && c.UserEmail == userEmail).FirstOrDefaultAsync();
-    if (checkout == null)
-    {
-        return NotFound(new { Message = "Checkout record not found" });
-    }
-    
-    // Check if the payment status is "Paid"
-    if (checkout.PaymentStatus != "Paid")
-    {
-        return BadRequest(new { Message = "Payment not completed. Please complete the payment first." });
-    }
-
-    // Check if the purchase status is "Purchased"
-    if (checkout.PurchaseStatus != "Purchased")
-    {
-        return BadRequest(new { Message = "Purchase not completed. Please complete the purchase first." });
-    }
-
-    // Map CheckoutModel to PurchaseModel
-    var purchase = new PurchaseModel
-    {
-        PurchaseId = Guid.NewGuid(),
-        userEmail = currentUser.Email,
-        PurchaseDate = DateTime.UtcNow,
-        Items = checkout.Items.Select(i => new PurchasedItem
+        public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string userEmail)
         {
-            ProductId = i.ProductId,
-            ProductName = i.ProductName,
-            Price = i.Price,
-            Quantity = i.Quantity
-        }).ToList(),
-        IsShipped = false,
-        IsDelivered = false,
-        isOrderCancelled = false,
-        UserDetails = null,
-        IsUserDataAvailable = false
-    };
-    
-    Console.WriteLine(purchase);
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
 
-    // Insert the purchase object into the purchase collection
-    await _purchaseCollection.InsertOneAsync(purchase);
-    
-    // Delete the checkout object
-    await _checkoutCollection.DeleteOneAsync(c => c.CheckoutUuid == checkoutUuid);
+            // Check if the email matches the logged-in user's email
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to add this checkout to purchase table" });
+            }
 
-    return Ok(new { Message = "Item/s has been purchased successfully", PurchaseId = purchase.PurchaseId });
-}
+            // Fetch the checkout record based on the CheckoutUuid and UserEmail
+            var checkout = await _checkoutCollection.Find(c => c.CheckoutUuid == checkoutUuid && c.UserEmail == userEmail).FirstOrDefaultAsync();
+            if (checkout == null)
+            {
+                return NotFound(new { Message = "Checkout record not found" });
+            }
+            
+            // Check if the payment status is "Paid"
+            if (checkout.PaymentStatus != "Paid")
+            {
+                return BadRequest(new { Message = "Payment not completed. Please complete the payment first." });
+            }
+
+            // Check if the purchase status is "Purchased"
+            if (checkout.PurchaseStatus != "Purchased")
+            {
+                return BadRequest(new { Message = "Purchase not completed. Please complete the purchase first." });
+            }
+
+            // Map CheckoutModel to PurchaseModel
+            var purchase = new PurchaseModel
+            {
+                PurchaseId = Guid.NewGuid(),
+                userEmail = currentUser.Email,
+                PurchaseDate = DateTime.UtcNow,
+                Items = checkout.Items.Select(i => new PurchasedItem
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.ProductName,
+                    Price = i.Price,
+                    Quantity = i.Quantity
+                }).ToList(),
+                IsShipped = false,
+                IsDelivered = false,
+                isOrderCancelled = false,
+                UserDetails = null,
+                IsUserDataAvailable = false
+            };
+            
+
+            // Insert the purchase object into the purchase collection
+            await _purchaseCollection.InsertOneAsync(purchase);
+            
+            // Delete the checkout object
+            await _checkoutCollection.DeleteOneAsync(c => c.CheckoutUuid == checkoutUuid);
+
+            return Ok(new { Message = "Item/s has been purchased successfully", PurchaseId = purchase.PurchaseId });
+        }
         
+        // Update Delivery Status
         [HttpPut("update-delivery-status/{purchaseId}/{userEmail}")]
         public async Task<IActionResult> UpdateDeliveryStatus(Guid purchaseId, string userEmail)
         {
@@ -141,6 +143,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
             return Ok(new { Message = "Delivery status updated successfully" });
         }
         
+        // Add User Details to Shipping
         [HttpPut("add-user-details/{purchaseId}")]
         public async Task<IActionResult> AddUserDetails(Guid purchaseId, [FromBody] UserData userDetails)
         {
@@ -191,6 +194,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
             return Ok(new { Message = "User details added successfully" });
         }
         
+        // Update User Details to Shipping
         [HttpPut ("update-user-details/{purchaseId}")]
         public async Task<IActionResult> UpdateUserDetails(Guid purchaseId, [FromBody] UserData userDetails)
         {
@@ -235,6 +239,7 @@ public async Task<IActionResult> AddToPurchaseTable(Guid checkoutUuid, string us
             return Ok(new { Message = "User details updated successfully" });
         }
         
+        // Request to Cancel Order
         [HttpPatch ("request-cancel-order/{purchaseId}")]
         public async Task<IActionResult> CancelOrder(Guid purchaseId)
         {

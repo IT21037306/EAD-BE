@@ -24,12 +24,14 @@ public class AuthController : ControllerBase
     private readonly SignInManager<CustomApplicationUser> _signInManager;
     private string[] roles = { "Admin", "User", "CSR" };
 
+    // Constructor
     public AuthController(UserManager<CustomApplicationUser> userManager, SignInManager<CustomApplicationUser> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
     }
 
+    // Signup
     [HttpPost("signup")]
     public async Task<IActionResult> Signup([FromBody] SignUpModel request)
     {
@@ -106,6 +108,7 @@ public class AuthController : ControllerBase
         return Ok(new { Message = "User created successfully" });
     }
     
+    // Login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel request)
     {
@@ -179,6 +182,7 @@ public class AuthController : ControllerBase
         return Ok(new { Message = "Login successful", Token = tokenString, User = userDto });
     }
     
+    // Logout
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
     {
