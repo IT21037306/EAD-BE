@@ -40,22 +40,20 @@ builder.Services.Configure<MongoDbSettings>(options =>
 builder.Services.AddSingleton<IMongoDbSettings>(sp =>
     sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
 
-// builder.Services.AddIdentity<MongoIdentityUser<Guid>, MongoIdentityRole<Guid>>()
-//     .AddMongoDbStores<MongoIdentityUser<Guid>, MongoIdentityRole<Guid>, Guid>(
-//         Environment.GetEnvironmentVariable("MONGO_URL"),
-//         Environment.GetEnvironmentVariable("DB_NAME"))
-//     .AddDefaultTokenProviders();
 
 builder.Services.AddSingleton<MongoDbContextProduct>();
 
+// Configure Identity services with MongoDB stores
 builder.Services.AddIdentity<CustomApplicationUser, MongoIdentityRole<Guid>>()
     .AddMongoDbStores<CustomApplicationUser, MongoIdentityRole<Guid>, Guid>(
         Environment.GetEnvironmentVariable("MONGO_URL"),
         Environment.GetEnvironmentVariable("DB_NAME"))
     .AddDefaultTokenProviders();
 
+// Add controllers and services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+// Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo() { Title = "My API", Version = "v1" });
@@ -86,6 +84,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+// Add authorization services
 builder.Services.AddAuthorization();
 
 // Add CORS services
@@ -143,6 +142,7 @@ if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
 
 var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
 
+// Configure JWT authentication with token validation parameters
 var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.AddAuthentication(options =>
     {
