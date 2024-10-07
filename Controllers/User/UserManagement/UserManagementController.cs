@@ -1,3 +1,10 @@
+/*
+ * File: UserManagementController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for User Management
+ */
+
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;

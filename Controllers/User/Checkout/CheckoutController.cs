@@ -1,3 +1,10 @@
+/*
+ * File: CheckoutController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Checkout
+ */
+
+
 using EAD_BE.Models.User.Checkout;
 using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Common;

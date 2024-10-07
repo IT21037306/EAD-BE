@@ -1,3 +1,10 @@
+/*
+ * File: CategoryController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of Vendor Operations for Categories
+ */
+
+
 using EAD_BE.Models.User.Common;
 using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authorization;

@@ -1,4 +1,10 @@
-using EAD_BE.Data;
+/*
+ * File: InventoryController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of Admin Operations for Inventory
+ */
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Common;
 using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authorization;

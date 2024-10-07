@@ -1,3 +1,10 @@
+/*
+ * File: VendorController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of Admin Operations for Vendors
+ */
+
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;

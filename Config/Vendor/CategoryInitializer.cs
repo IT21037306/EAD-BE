@@ -1,3 +1,10 @@
+/*
+ * File: CategoryInitializer.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Configuration class of Vendor Operations for Product Category Management
+ */
+
+
 using EAD_BE.Models.Vendor.Product;
 using MongoDB.Driver;
 

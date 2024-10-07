@@ -1,4 +1,11 @@
-using EAD_BE.Data;
+/*
+ * File: InventoryController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of Vendor Operations for Inventory
+ */
+
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;

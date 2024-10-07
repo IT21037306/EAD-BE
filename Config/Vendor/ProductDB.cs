@@ -1,7 +1,14 @@
-using MongoDB.Driver;
-using EAD_BE.Models.Vendor.Product;
+/*
+ * File: ProductDB.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Config class of Vendor Operations for Product Management
+ */
 
-namespace EAD_BE.Data
+
+using EAD_BE.Models.Vendor.Product;
+using MongoDB.Driver;
+
+namespace EAD_BE.Config.Vendor
 {
     public class MongoDbContextProduct
     {

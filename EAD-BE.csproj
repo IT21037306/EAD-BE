@@ -25,7 +25,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Config\CSR\UserManagement\" />
       <Folder Include="Models\Vendor\" />
     </ItemGroup>
 

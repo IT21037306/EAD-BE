@@ -1,3 +1,10 @@
+/*
+ * File: PurchaseModel.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Model class of User Operations for Purchased Items
+ */
+
+
 namespace EAD_BE.Models.User.Purchased;
 
 public class PurchaseModel

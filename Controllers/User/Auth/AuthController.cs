@@ -1,3 +1,10 @@
+/*
+ * File: AuthController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Authentication
+ */
+
+
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;

@@ -1,3 +1,10 @@
+/*
+ * File: Program.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Entry point for the application
+ */
+
+
 using System.Text;
 using EAD_BE.Config;
 using AspNetCore.Identity.MongoDbCore.Models;
@@ -7,7 +14,6 @@ using Microsoft.Extensions.Options;
 using DotNetEnv;
 using EAD_BE.Config.User;
 using EAD_BE.Config.Vendor;
-using EAD_BE.Data;
 using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Checkout;
 using EAD_BE.Models.User.Common;

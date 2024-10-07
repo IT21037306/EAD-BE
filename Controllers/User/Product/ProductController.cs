@@ -1,4 +1,11 @@
-using EAD_BE.Data;
+/*
+ * File: ProductController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Products
+ */
+
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Common;
 using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authorization;

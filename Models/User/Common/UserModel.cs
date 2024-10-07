@@ -1,3 +1,10 @@
+/*
+ * File: UserModel.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Model class of User Operations for Common User Management
+ */
+
+
 namespace EAD_BE.Models.User.Common;
 
 using AspNetCore.Identity.MongoDbCore.Models;

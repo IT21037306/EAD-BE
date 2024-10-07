@@ -1,3 +1,10 @@
+/*
+ * File: MongoDbConnectionChecker.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Config class of connection checker for MongoDB
+ */
+
+
 using MongoDB.Driver;
 using MongoDB.Bson;
 using System;
