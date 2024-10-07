@@ -63,7 +63,7 @@ namespace EAD_BE.Controllers.User.Order
             // Check if the email matches the logged-in user's email
             if (currentUser.Email != userEmail)
             {
-                return BadRequest(new { Message = "You are not authorized to view this cart" });
+                return BadRequest(new { Message = "You are not authorized to access this cart" });
             }
 
             // Fetch the cart based on the UserEmail
