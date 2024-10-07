@@ -1,3 +1,10 @@
+/*
+ * File: MongoDbSettings.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Class of MongoDB Connection Settings
+ */
+
+
 namespace EAD_BE.Config;
 
 public class MongoDbSettings : IMongoDbSettings

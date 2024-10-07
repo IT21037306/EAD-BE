@@ -1,4 +1,10 @@
-﻿# Use the official .NET SDK image
+﻿
+# * File: Dockerfile
+# * Author: Ahamed Fahmi (IT21037306)
+# * Description: Dockerfile for the EAD-BE project
+
+
+# Use the official .NET SDK image
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /app
 

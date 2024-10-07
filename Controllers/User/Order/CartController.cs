@@ -1,4 +1,11 @@
-using EAD_BE.Data;
+/*
+ * File: CartController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Cart
+ */
+
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Mvc;

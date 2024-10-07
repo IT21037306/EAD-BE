@@ -1,3 +1,10 @@
+/*
+ * File: UserManagement.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of CSR Operations for User Management
+ */
+
+
 using AspNetCore.Identity.MongoDbCore.Models;
 using EAD_BE.Models.CSR.UserManagement;
 using EAD_BE.Models.User.Common;

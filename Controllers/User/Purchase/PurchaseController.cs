@@ -1,4 +1,11 @@
-using EAD_BE.Data;
+/*
+ * File: PurchaseController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Purchases
+ */
+
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Purchased;
 using EAD_BE.Models.User.Checkout;
 using EAD_BE.Models.User.Common;

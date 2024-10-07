@@ -1,5 +1,12 @@
+/*
+ * File: ProductController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of Vendor Operations for Products
+ */
+
+
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.Vendor.Product;
-using EAD_BE.Data;
 using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Common;
 using Microsoft.AspNetCore.Authorization;

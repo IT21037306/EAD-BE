@@ -1,3 +1,10 @@
+/*
+ * File: PurchaseController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of CSR Operations for Purchases
+ */
+
+
 namespace EAD_BE.Controllers.CSR.Purchase
 {
     using EAD_BE.Models.User.Purchased;

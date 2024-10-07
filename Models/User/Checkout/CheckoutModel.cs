@@ -1,3 +1,9 @@
+/*
+ * File: CheckoutModel.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Model class of User Operations for Authentication
+ */
+
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using System;

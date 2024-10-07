@@ -1,3 +1,9 @@
+/*
+ * File: RoleInitializer.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Configuration class for User Role Initialization
+ */
+
 namespace EAD_BE.Config.User;
 
 using AspNetCore.Identity.MongoDbCore.Models;
