@@ -21,11 +21,13 @@ namespace EAD_BE.Controllers.CSR.UserManagement
     {
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public UserManagement(UserManager<CustomApplicationUser> userManager)
         {
             _userManager = userManager;
         }
         
+        // Display All Users
         [HttpGet("all-users")]
         public IActionResult GetAllUsers()
         {
@@ -33,6 +35,7 @@ namespace EAD_BE.Controllers.CSR.UserManagement
             return Ok(users);
         }
         
+        // Update User State
         [HttpPatch("update-user-state")]
         public async Task<IActionResult> UpdateUserState([FromBody] UpdateStateModel request)
         {

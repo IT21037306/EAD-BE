@@ -22,11 +22,13 @@ namespace EAD_BE.Controllers.Admin
     {
         private readonly IMongoCollection<CheckoutModel> _orderCollection;
 
+        // Constructor
         public OrderController(IMongoCollection<CheckoutModel> orderCollection)
         {
             _orderCollection = orderCollection;
         }
 
+        // Display All Orders
         [HttpGet("all-orders")]
         public async Task<IActionResult> GetAllOrders()
         {

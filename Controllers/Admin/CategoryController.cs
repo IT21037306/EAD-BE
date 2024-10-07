@@ -22,12 +22,14 @@ namespace EAD_BE.Controllers.Admin
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public CategoryController(IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
         {
             _categoryCollection = categoryCollection;
             _userManager = userManager;
         }
 
+        // Update Category
         [HttpPut("update-category-status/{id}")]
         public async Task<IActionResult> UpdateCategoryStatus(Guid id)
         {

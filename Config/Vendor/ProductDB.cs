@@ -14,12 +14,14 @@ namespace EAD_BE.Config.Vendor
     {
         private readonly IMongoDatabase _database;
 
+        // Constructor
         public MongoDbContextProduct(IConfiguration configuration)
         {
             var client = new MongoClient(Environment.GetEnvironmentVariable("MONGO_URL"));
             _database = client.GetDatabase(Environment.GetEnvironmentVariable("DB_NAME"));
         }
 
+        // Products Collection
         public IMongoCollection<ProductModel> Products => _database.GetCollection<ProductModel>("Products");
     }
 }

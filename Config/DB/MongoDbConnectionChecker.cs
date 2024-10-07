@@ -15,12 +15,14 @@ public class MongoDbConnectionChecker
     private readonly string _connectionString;
     private readonly string _databaseName;
 
+    //constructor
     public MongoDbConnectionChecker(string connectionString, string databaseName)
     {
         _connectionString = connectionString;
         _databaseName = databaseName;
     }
 
+    //check the mongo db connection
     public async Task<bool> CheckConnectionAsync()
     {
         try

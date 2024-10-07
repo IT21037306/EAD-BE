@@ -16,11 +16,13 @@ public class RoleInitializer
     private readonly RoleManager<MongoIdentityRole<Guid>> _roleManager;
     private readonly string[] _roles = { "Admin", "User", "Vendor", "CSR" };
 
+    // Constructor
     public RoleInitializer(RoleManager<MongoIdentityRole<Guid>> roleManager)
     {
         _roleManager = roleManager;
     }
 
+    // Initialize Roles
     public async Task InitializeRoles()
     {
         foreach (var role in _roles)

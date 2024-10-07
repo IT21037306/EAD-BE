@@ -24,6 +24,7 @@ namespace EAD_BE.Controllers.User.Checkout
         private readonly IMongoCollection<CheckoutModel> _checkoutCollection;
         private readonly UserManager<CustomApplicationUser> _userManager;
 
+        // Constructor
         public CheckoutController(IMongoCollection<Cart> cartCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomApplicationUser> userManager)
         {
             _cartCollection = cartCollection;
@@ -31,6 +32,7 @@ namespace EAD_BE.Controllers.User.Checkout
             _userManager = userManager;
         }
 
+        // Checkout items in Cart
         [HttpPost("checkout/{userEmail}")]
         public async Task<IActionResult> Checkout(String userEmail)
         {
@@ -80,6 +82,7 @@ namespace EAD_BE.Controllers.User.Checkout
             return Ok(new { Message = "Checkout successful", CheckoutId = checkout.CheckoutUuid });
         }
         
+        // Approve Payment Status
         [HttpPut("approve-payment-status/{checkoutUuid}/{userEmail}")]
         public async Task<IActionResult> UpdatePaymentStatus(Guid checkoutUuid, string userEmail)
         {
@@ -115,6 +118,7 @@ namespace EAD_BE.Controllers.User.Checkout
             return Ok(new { Message = "Payment status updated to Paid and purchase status updated to Purchased successfully" });
         }
         
+        // Cancel Payment Status
         [HttpPut("cancel-payment-status/{checkoutUuid}/{userEmail}")]
         public async Task<IActionResult> CancelPaymentStatus(Guid checkoutUuid, string userEmail)
         {
