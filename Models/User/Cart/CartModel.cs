@@ -25,7 +25,7 @@ namespace EAD_BE.Models.User.Cart
         [BsonRepresentation(BsonType.ObjectId)] // Stored as ObjectId in MongoDB
         public string Id { get; set; } = ObjectId.GenerateNewId().ToString(); // Initialize with a new ObjectId
 
-        public Guid CartUuid { get; set; } = Guid.NewGuid(); // Custom UUID for the cart
+        public Guid CartUuid { get; set; } = Guid.NewGuid(); 
         public String UserEmail { get; set; }
         public List<CartItem> Items { get; set; } = new List<CartItem>();
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
