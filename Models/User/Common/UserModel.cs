@@ -18,5 +18,22 @@ public class CustomApplicationUser : MongoIdentityUser<Guid>
         
     public string Address { get; set; }
     
+    public int Ranking { get; set; } = 0;
+    
+    public int RankingCount { get; set; } = 0;
+    
+    public List<CommentVendor> Comments { get; set; } = new List<CommentVendor>();
+    
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
+}
+
+
+public class CommentVendor
+{
+    public Guid commentID { get; set; }
+    public string UserEmail { get; set; }
+    public string Text { get; set; }
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 }
