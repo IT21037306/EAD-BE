@@ -8,9 +8,9 @@ using MongoDB.Driver;
 
 public class VendorController : ControllerBase
 {
-    private readonly UserManager<CustomApplicationUser> _userManager;
+    private readonly UserManager<CustomUserModel> _userManager;
 
-    public VendorController(UserManager<CustomApplicationUser> userManager)
+    public VendorController(UserManager<CustomUserModel> userManager)
     {
         _userManager = userManager;
     }

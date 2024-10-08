@@ -21,14 +21,14 @@ namespace EAD_BE.Controllers.Admin.Vendor
     [Authorize(Roles = "Admin")]
     public class VendorController : ControllerBase
     {
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
         private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
         private string address;
         private string phoneNumber;
         
 
         // Constructor
-        public VendorController( UserManager<CustomApplicationUser> userManager)
+        public VendorController( UserManager<CustomUserModel> userManager)
         {
             _userManager = userManager;
         }
@@ -58,7 +58,7 @@ namespace EAD_BE.Controllers.Admin.Vendor
                 return BadRequest(new { Message = "Email is already in use" });
             }
             
-            var user = new CustomApplicationUser
+            var user = new CustomUserModel
             {
                 UserName = request.UserName,
                 Email = request.Email,

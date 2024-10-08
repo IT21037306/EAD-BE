@@ -22,10 +22,10 @@ namespace EAD_BE.Controllers.User.Checkout
     {
         private readonly IMongoCollection<Cart> _cartCollection;
         private readonly IMongoCollection<CheckoutModel> _checkoutCollection;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public CheckoutController(IMongoCollection<Cart> cartCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomApplicationUser> userManager)
+        public CheckoutController(IMongoCollection<Cart> cartCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomUserModel> userManager)
         {
             _cartCollection = cartCollection;
             _checkoutCollection = checkoutCollection;

@@ -22,10 +22,10 @@ public class ProductController : ControllerBase
 {
     private readonly MongoDbContextProduct _context;
     private readonly IMongoCollection<CategoryModel> _categoryCollection;
-    private readonly UserManager<CustomApplicationUser> _userManager;
+    private readonly UserManager<CustomUserModel> _userManager;
 
     // Constructor
-    public ProductController(MongoDbContextProduct context , IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
+    public ProductController(MongoDbContextProduct context , IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomUserModel> userManager)
     {
         _context = context;
         _categoryCollection = categoryCollection;

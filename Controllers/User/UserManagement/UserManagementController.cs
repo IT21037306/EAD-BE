@@ -19,10 +19,10 @@ namespace EAD_BE.Controllers.User.UserManagement
     [Authorize (Roles = "User")]
     public class UserManagementController : ControllerBase
     {
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public UserManagementController(UserManager<CustomApplicationUser>  userManager)
+        public UserManagementController(UserManager<CustomUserModel>  userManager)
         {
             _userManager = userManager;
         }
