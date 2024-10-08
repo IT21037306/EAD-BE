@@ -1,3 +1,10 @@
+/*
+ * File: VendorController.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Controller class of User Operations for Vendors
+ */
+
+
 namespace EAD_BE.Controllers.User.Vendor;
 
 using EAD_BE.Models.User.Common;
