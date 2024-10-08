@@ -20,10 +20,10 @@ namespace EAD_BE.Controllers.Admin
     public class CategoryController : ControllerBase
     {
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public CategoryController(IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
+        public CategoryController(IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomUserModel> userManager)
         {
             _categoryCollection = categoryCollection;
             _userManager = userManager;

@@ -22,10 +22,10 @@ namespace EAD_BE.Controllers.Vendor
     {
         private readonly MongoDbContextProduct _context;
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public InventoryController(MongoDbContextProduct context, IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomApplicationUser> userManager)
+        public InventoryController(MongoDbContextProduct context, IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomUserModel> userManager)
         {
             _context = context;
             _categoryCollection = categoryCollection;

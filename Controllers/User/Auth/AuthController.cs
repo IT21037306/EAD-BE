@@ -19,13 +19,13 @@ using Microsoft.IdentityModel.Tokens;
 [Route("api/[controller]")]
 public class AuthController : ControllerBase
 {
-    private readonly UserManager<CustomApplicationUser> _userManager;
+    private readonly UserManager<CustomUserModel> _userManager;
     private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
-    private readonly SignInManager<CustomApplicationUser> _signInManager;
+    private readonly SignInManager<CustomUserModel> _signInManager;
     private string[] roles = { "Admin", "User", "CSR" };
 
     // Constructor
-    public AuthController(UserManager<CustomApplicationUser> userManager, SignInManager<CustomApplicationUser> signInManager)
+    public AuthController(UserManager<CustomUserModel> userManager, SignInManager<CustomUserModel> signInManager)
     {
         _userManager = userManager;
         _signInManager = signInManager;
@@ -61,7 +61,7 @@ public class AuthController : ControllerBase
             return BadRequest(new { Message = "Email is already in use" });
         }
 
-        var user = new CustomApplicationUser
+        var user = new CustomUserModel
         {
             UserName = request.UserName,
             Email = request.Email,

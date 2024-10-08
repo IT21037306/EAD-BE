@@ -22,10 +22,10 @@ namespace EAD_BE.Controllers.User.Order
     {
         private readonly IMongoCollection<Cart> _cartCollection;
         private readonly MongoDbContextProduct _context;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public CartController(IMongoCollection<Cart> cartCollection , MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager)
+        public CartController(IMongoCollection<Cart> cartCollection , MongoDbContextProduct context, UserManager<CustomUserModel> userManager)
         {
             _cartCollection = cartCollection;
             _context = context;

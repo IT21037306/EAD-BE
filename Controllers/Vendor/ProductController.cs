@@ -22,13 +22,13 @@ namespace EAD_BE.Controllers.Vendor
     public class ProductController : ControllerBase
     {
         private readonly MongoDbContextProduct _context;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
         private readonly IMongoCollection<Cart> _cartCollection;
         
 
         // Constructor
-        public ProductController(MongoDbContextProduct context, UserManager<CustomApplicationUser> userManager, IMongoCollection<CategoryModel> categoryCollection, IMongoCollection<Cart> cartCollection)
+        public ProductController(MongoDbContextProduct context, UserManager<CustomUserModel> userManager, IMongoCollection<CategoryModel> categoryCollection, IMongoCollection<Cart> cartCollection)
         {
             _context = context;
             _userManager = userManager;

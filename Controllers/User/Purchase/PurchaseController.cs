@@ -23,11 +23,11 @@ namespace EAD_BE.Controllers.User.Purchase
     {
         private readonly IMongoCollection<PurchaseModel> _purchaseCollection;
         private readonly IMongoCollection<CheckoutModel> _checkoutCollection;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
         private readonly MongoDbContextProduct _productCollection;
 
         // Constructor
-        public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomApplicationUser> userManager, MongoDbContextProduct productCollection)
+        public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomUserModel> userManager, MongoDbContextProduct productCollection)
         {
             _purchaseCollection = purchaseCollection;
             _checkoutCollection = checkoutCollection;

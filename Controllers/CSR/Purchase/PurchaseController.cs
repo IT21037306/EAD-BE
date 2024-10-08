@@ -23,10 +23,10 @@ namespace EAD_BE.Controllers.CSR.Purchase
     public class PurchaseController : ControllerBase
     {
         private readonly IMongoCollection<PurchaseModel> _purchaseCollection;
-        private readonly UserManager<CustomApplicationUser> _userManager;
+        private readonly UserManager<CustomUserModel> _userManager;
 
         // Constructor
-        public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, UserManager<CustomApplicationUser> userManager)
+        public PurchaseController(IMongoCollection<PurchaseModel> purchaseCollection, UserManager<CustomUserModel> userManager)
         {
             _purchaseCollection = purchaseCollection;
             _userManager = userManager;
