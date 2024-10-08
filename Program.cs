@@ -44,8 +44,8 @@ builder.Services.AddSingleton<IMongoDbSettings>(sp =>
 builder.Services.AddSingleton<MongoDbContextProduct>();
 
 // Configure Identity services with MongoDB stores
-builder.Services.AddIdentity<CustomApplicationUser, MongoIdentityRole<Guid>>()
-    .AddMongoDbStores<CustomApplicationUser, MongoIdentityRole<Guid>, Guid>(
+builder.Services.AddIdentity<CustomUserModel, MongoIdentityRole<Guid>>()
+    .AddMongoDbStores<CustomUserModel, MongoIdentityRole<Guid>, Guid>(
         Environment.GetEnvironmentVariable("MONGO_URL"),
         Environment.GetEnvironmentVariable("DB_NAME"))
     .AddDefaultTokenProviders();
