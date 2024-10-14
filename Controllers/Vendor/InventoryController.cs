@@ -4,14 +4,16 @@
  * Description: Controller class of Vendor Operations for Inventory
  */
 
-
 using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Common;
+using EAD_BE.Models.Vendor.Inventory;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 using EAD_BE.Models.Vendor.Product;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
+using DotNetEnv;
+using MailKit.Security;
 
 namespace EAD_BE.Controllers.Vendor
 {
@@ -23,6 +25,11 @@ namespace EAD_BE.Controllers.Vendor
         private readonly MongoDbContextProduct _context;
         private readonly IMongoCollection<CategoryModel> _categoryCollection;
         private readonly UserManager<CustomUserModel> _userManager;
+        
+        private readonly string SMTPServer = Environment.GetEnvironmentVariable("SMTP_SERVER");
+        private readonly int SMTPPort = int.Parse(Environment.GetEnvironmentVariable("SMTP_PORT"));
+        private readonly string SMTPUsername = Environment.GetEnvironmentVariable("SMTP_USER");
+        private readonly string SMTPPassword = Environment.GetEnvironmentVariable("SMTP_PASSWORD");
 
         // Constructor
         public InventoryController(MongoDbContextProduct context, IMongoCollection<CategoryModel> categoryCollection, UserManager<CustomUserModel> userManager)
@@ -77,6 +84,26 @@ namespace EAD_BE.Controllers.Vendor
                             currentStock = product.StockQuantity,
                             CreatedAt = DateTime.UtcNow
                         };
+                        
+                        var emailSender = new EmailNotificationModel
+                            (SMTPServer, 
+                                SMTPPort, 
+                                SMTPUsername, 
+                                SMTPPassword,
+                                SecureSocketOptions.SslOnConnect);
+                        
+                        var subject = $"Low Stock Alert: {product.Name}";
+                        var htmlMessage = $@"
+                                <html>
+                                <body>
+                                    <h1>Low Stock Alert</h1>
+                                    <p>The stock for product <strong>{product.Name}</strong> is low.</p>
+                                    <p>Current stock quantity is <strong>{product.StockQuantity}</strong>.</p>
+                                    <p>Please restock as soon as possible.</p>
+                                </body>
+                                </html>";
+
+                        await emailSender.SendEmailAsync(userEmail, subject, htmlMessage);
 
                         // Save the product to the database
                         //await _context.Products.ReplaceOneAsync(p => p.Id == product.Id, product, new ReplaceOptions { IsUpsert = true });
