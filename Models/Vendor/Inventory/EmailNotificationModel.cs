@@ -1,3 +1,9 @@
+/*
+ * File: EmailNotificationModel.cs
+ * Author: Ahamed Fahmi (IT21037306)
+ * Description: Model class of Vendor Operations for Email Notification
+ */
+
 using Microsoft.AspNetCore.Identity.UI.Services;
 using MailKit.Net.Smtp;
 using MimeKit;
