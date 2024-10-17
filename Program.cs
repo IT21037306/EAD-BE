@@ -4,7 +4,6 @@
  * Description: Entry point for the application
  */
 
-
 using System.Text;
 using EAD_BE.Config;
 using AspNetCore.Identity.MongoDbCore.Models;
@@ -30,35 +29,39 @@ var builder = WebApplication.CreateBuilder(args);
 
 Env.Load();
 
+// Load settings from appsettings.json
+var jwtSettings = builder.Configuration.GetSection("JwtSettings");
+var mongoUrl = builder.Configuration.GetSection("DatabaseSettings")["MONGO_URL"];
+var dbName = builder.Configuration.GetSection("DatabaseSettings")["DB_NAME"];
+var secretKey = builder.Configuration.GetSection("JwtSettings")["Secret"];
+
 // Add services to the container.
 builder.Services.Configure<MongoDbSettings>(options =>
 {
-    options.ConnectionString = Environment.GetEnvironmentVariable("MONGO_URL");
-    options.DatabaseName = Environment.GetEnvironmentVariable("DB_NAME");
+    options.ConnectionString = mongoUrl;
+    options.DatabaseName = dbName;
 });
 
 builder.Services.AddSingleton<IMongoDbSettings>(sp =>
     sp.GetRequiredService<IOptions<MongoDbSettings>>().Value);
 
-
 builder.Services.AddSingleton<MongoDbContextProduct>();
 
 // Configure Identity services with MongoDB stores
 builder.Services.AddIdentity<CustomUserModel, MongoIdentityRole<Guid>>()
-    .AddMongoDbStores<CustomUserModel, MongoIdentityRole<Guid>, Guid>(
-        Environment.GetEnvironmentVariable("MONGO_URL"),
-        Environment.GetEnvironmentVariable("DB_NAME"))
+    .AddMongoDbStores<CustomUserModel, MongoIdentityRole<Guid>, Guid>(mongoUrl, dbName)
     .AddDefaultTokenProviders();
 
 // Add controllers and services
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
+
 // Add Swagger services
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo() { Title = "My API", Version = "v1" });
 
-    // Add Bearer token authentication
+    // Add Bearer token authentication to Swagger UI
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
         In = ParameterLocation.Header,
@@ -84,6 +87,7 @@ builder.Services.AddSwaggerGen(c =>
         }
     });
 });
+
 // Add authorization services
 builder.Services.AddAuthorization();
 
@@ -103,9 +107,6 @@ builder.Services.AddCors(options =>
 builder.Services.AddScoped<RoleInitializer>();
 
 // Ensure the database is created if it does not exist and check the connection
-var mongoUrl = Environment.GetEnvironmentVariable("MONGO_URL");
-var dbName = Environment.GetEnvironmentVariable("DB_NAME");
-
 if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
 {
     var connectionChecker = new MongoDbConnectionChecker(mongoUrl, dbName);
@@ -121,34 +122,31 @@ if (!string.IsNullOrEmpty(mongoUrl) && !string.IsNullOrEmpty(dbName))
     var database = client.GetDatabase(dbName);
     // This will create the database if it does not exist
     await database.RunCommandAsync((Command<BsonDocument>)"{ping:1}");
-    
+
     // Register the CategoryInitializer service
     var categoryCollection = database.GetCollection<CategoryModel>("Categories");
     builder.Services.AddSingleton(categoryCollection);
     builder.Services.AddTransient<CategoryInitializer>();
-    
+
     // Register the Cart collection
     var cartCollection = database.GetCollection<Cart>("Cart");
     builder.Services.AddSingleton(cartCollection);
-    
+
     // Register the Checkout collection
     var checkoutCollection = database.GetCollection<CheckoutModel>("Checkout");
     builder.Services.AddSingleton(checkoutCollection);
-    
+
     // Register the Checkout collection
     var purchaseCollection = database.GetCollection<PurchaseModel>("Purchase");
     builder.Services.AddSingleton(purchaseCollection);
 }
 
-var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET");
-
 // Configure JWT authentication with token validation parameters
-var jwtSettings = builder.Configuration.GetSection("JwtSettings");
 builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
     .AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters()
@@ -171,28 +169,17 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     var roleInitializer = services.GetRequiredService<RoleInitializer>();
     await roleInitializer.InitializeRoles();
-    
+
     // Initialize categories
     var categoryInitializer = services.GetRequiredService<CategoryInitializer>();
     await categoryInitializer.InitializeCategories();
 }
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(c =>
-    {
-        c.SwaggerEndpoint(Environment.GetEnvironmentVariable("DEV_ENV_DEFAULT_URL"), Environment.GetEnvironmentVariable("DEV_ENV_API_NAME"));
-        c.RoutePrefix = string.Empty; // Set Swagger UI at the app's root
-    });
+    app.UseSwaggerUI();
 }
-
-// if (app.Environment.IsDevelopment())
-// {
-//     app.UseSwagger();
-//     app.UseSwaggerUI();
-// }
 
 app.UseHttpsRedirection();
 app.UseCors("AllowSpecificOrigin"); // Use the CORS policy

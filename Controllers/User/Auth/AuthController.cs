@@ -4,7 +4,6 @@
  * Description: Controller class of User Operations for Authentication
  */
 
-
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using EAD_BE.Models.UserManagement;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Configuration;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -22,13 +22,15 @@ public class AuthController : ControllerBase
     private readonly UserManager<CustomUserModel> _userManager;
     private static readonly List<SignUpModel> _signUpModels = new List<SignUpModel>();
     private readonly SignInManager<CustomUserModel> _signInManager;
+    private readonly IConfiguration _configuration;
     private string[] roles = { "Admin", "User", "CSR" };
 
     // Constructor
-    public AuthController(UserManager<CustomUserModel> userManager, SignInManager<CustomUserModel> signInManager)
+    public AuthController(UserManager<CustomUserModel> userManager, SignInManager<CustomUserModel> signInManager, IConfiguration configuration)
     {
         _userManager = userManager;
         _signInManager = signInManager;
+        _configuration = configuration;
     }
 
     // Signup
@@ -44,7 +46,7 @@ public class AuthController : ControllerBase
         {
             request.Role = "User";
         }
-        
+
         if (string.IsNullOrEmpty(request.Role))
         {
             return BadRequest(new { Message = "Role is required" });
@@ -89,17 +91,15 @@ public class AuthController : ControllerBase
             await _userManager.AddToRoleAsync(user, "CSR");
             await _userManager.AddToRoleAsync(user, "Admin");
             await _userManager.AddToRoleAsync(user, "Vendor");
-
-            
-        } else if (request.Role.Equals("CSR", StringComparison.OrdinalIgnoreCase))
+        }
+        else if (request.Role.Equals("CSR", StringComparison.OrdinalIgnoreCase))
         {
             await _userManager.AddToRoleAsync(user, "User");
             await _userManager.AddToRoleAsync(user, "CSR");
-
-        }else if (request.Role == null)
+        }
+        else if (request.Role == null)
         {
             await _userManager.AddToRoleAsync(user, "User");
-
         }
 
         // Store the user details as SignUpModel object with default state
@@ -107,7 +107,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { Message = "User created successfully" });
     }
-    
+
     // Login
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginModel request)
@@ -122,7 +122,7 @@ public class AuthController : ControllerBase
         {
             return Unauthorized(new { Message = "Email not found" });
         }
-        
+
         if (user.State == "inactive")
         {
             return Unauthorized(new { Message = "Account is suspended. Please contact CSR." });
@@ -158,14 +158,14 @@ public class AuthController : ControllerBase
         }
 
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("JWT_SECRET"));
+        var key = Encoding.UTF8.GetBytes(_configuration["JwtSettings:Secret"]);
         var tokenDescriptor = new SecurityTokenDescriptor()
         {
             Subject = new ClaimsIdentity(authClaims),
             Expires = DateTime.UtcNow.AddHours(1),
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-            Issuer = Environment.GetEnvironmentVariable("JWT_ISSUER"),
-            Audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
+            Issuer = _configuration["JwtSettings:Issuer"],
+            Audience = _configuration["JwtSettings:Audience"]
         };
 
         var token = tokenHandler.CreateToken(tokenDescriptor);
@@ -181,7 +181,7 @@ public class AuthController : ControllerBase
 
         return Ok(new { Message = "Login successful", Token = tokenString, User = userDto });
     }
-    
+
     // Logout
     [HttpPost("logout")]
     public async Task<IActionResult> Logout()
