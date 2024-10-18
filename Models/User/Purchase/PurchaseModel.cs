@@ -5,10 +5,16 @@
  */
 
 
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+
 namespace EAD_BE.Models.User.Purchased;
 
 public class PurchaseModel
 {
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string Id { get; set; }
     public Guid PurchaseId { get; set; }
     public string userEmail { get; set; }
     public DateTime PurchaseDate { get; set; }
