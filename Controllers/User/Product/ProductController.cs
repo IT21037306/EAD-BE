@@ -80,6 +80,48 @@ public class ProductController : ControllerBase
         }
     }
     
+    // Display Products by Category Name
+    [HttpGet("products-by-category/{categoryName}")]
+    public async Task<IActionResult> GetProductsByCategoryName(string categoryName)
+    {
+        try
+        {
+            // Fetch the category to ensure it exists and is active
+            var category = await _categoryCollection.Find(c => c.Name == categoryName && c.IsActive).FirstOrDefaultAsync();
+            if (category == null)
+            {
+                return NotFound(new { Message = "Category not found or inactive" });
+            }
+
+            // Fetch products based on the category ID
+            var products = await _context.Products.Find(p => p.Category == category.Id).ToListAsync();
+            if (products == null || !products.Any())
+            {
+                return NotFound(new { Message = "No products found for the specified category" });
+            }
+
+            var productWithCategoryDetails = products.Select(product => new
+            {
+                product.Id,
+                product.Name,
+                product.Description,
+                product.Price,
+                product.StockQuantity,
+                Category = new { category.Id, category.Name },
+                product.CreatedAt,
+                product.UpdatedAt,
+                product.AddedByUserEmail,
+                product.ProductPicture
+            }).ToList();
+
+            return Ok(productWithCategoryDetails);
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { Message = "An error occurred while retrieving products", Details = ex.Message });
+        }
+    }
+    
         // Rate a product
         [HttpPost("rate-product/{productId}")]
         public async Task<IActionResult> RateProduct(Guid productId, [FromBody] int rating)

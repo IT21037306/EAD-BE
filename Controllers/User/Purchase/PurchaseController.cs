@@ -34,6 +34,28 @@ namespace EAD_BE.Controllers.User.Purchase
             _userManager = userManager;
             _productCollection = productCollection;
         }
+        
+        // Get All Purchases
+        [HttpGet("all-purchases")]
+        public async Task<IActionResult> GetAllPurchases()
+        {
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+
+            // Fetch all purchases based on the UserEmail
+            var purchases = await _purchaseCollection.Find(p => p.userEmail == currentUser.Email).ToListAsync();
+
+            if (purchases == null || !purchases.Any())
+            {
+                return NotFound(new { Message = "No purchases found for the specified user" });
+            }
+
+            return Ok(purchases);
+        }
 
         // Add Checkout items to Purchase Table
         [HttpPost("add-to-purchase/{checkoutUuid}/{userEmail}")]

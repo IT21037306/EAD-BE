@@ -127,12 +127,18 @@ namespace EAD_BE.Controllers.Vendor
             {
                 return NotFound(new { Message = "Product not found" });
             }
+            
+            var productInCart = await _cartCollection.Find(c => c.Items.Any(i => i.ProductId == id)).FirstOrDefaultAsync();
+            if (productInCart != null)
+            {
+                return BadRequest(new { Message = "Product exists in a cart and cannot be edited" });
+            }
 
             var currentUser = await _userManager.GetUserAsync(User);
-            var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+            //var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
             var isVendor = existingProduct.AddedByUserEmail == currentUser.Email;
 
-            if (!isAdmin && !isVendor)
+            if (product.AddedByUserEmail != currentUser.Email && !isVendor)
             {
                 return BadRequest(new { Message = "You do not have permission to update this product" });
             }
