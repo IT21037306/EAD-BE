@@ -310,7 +310,32 @@ namespace EAD_BE.Controllers.User.Order
                 return NotFound(new { Message = "Cart not found for the specified user" });
             }
 
-            return Ok(cart);
+            // Fetch product details for each item in the cart
+            var cartItems = new List<object>();
+            foreach (var item in cart.Items)
+            {
+                var product = await _context.Products.Find(p => p.Id == item.ProductId).FirstOrDefaultAsync();
+                if (product != null)
+                {
+                    cartItems.Add(new
+                    {
+                        item.ProductId,
+                        item.ProductName,
+                        item.Price,
+                        item.Quantity,
+                        product.ProductPicture 
+                    });
+                }
+            }
+
+            return Ok(new
+            {
+                cart.UserEmail,
+                cart.CartUuid,
+                cart.CreatedAt,
+                cart.UpdatedAt,
+                Items = cartItems
+            });
         }
         
         [HttpDelete("clear-cart/{userEmail}")]
