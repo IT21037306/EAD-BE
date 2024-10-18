@@ -311,19 +311,19 @@ namespace EAD_BE.Controllers.User.Order
             }
 
             // Fetch product details for each item in the cart
-            var cartItemsWithImages = new List<object>();
+            var cartItems = new List<object>();
             foreach (var item in cart.Items)
             {
                 var product = await _context.Products.Find(p => p.Id == item.ProductId).FirstOrDefaultAsync();
                 if (product != null)
                 {
-                    cartItemsWithImages.Add(new
+                    cartItems.Add(new
                     {
                         item.ProductId,
                         item.ProductName,
                         item.Price,
                         item.Quantity,
-                        product.ProductPicture // Assuming ProductPicture is the property for the image
+                        product.ProductPicture 
                     });
                 }
             }
@@ -334,7 +334,7 @@ namespace EAD_BE.Controllers.User.Order
                 cart.CartUuid,
                 cart.CreatedAt,
                 cart.UpdatedAt,
-                Items = cartItemsWithImages
+                Items = cartItems
             });
         }
         
