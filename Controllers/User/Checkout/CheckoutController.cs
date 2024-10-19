@@ -5,6 +5,7 @@
  */
 
 
+using EAD_BE.Config.Vendor;
 using EAD_BE.Models.User.Checkout;
 using EAD_BE.Models.User.Cart;
 using EAD_BE.Models.User.Common;
@@ -23,13 +24,15 @@ namespace EAD_BE.Controllers.User.Checkout
         private readonly IMongoCollection<Cart> _cartCollection;
         private readonly IMongoCollection<CheckoutModel> _checkoutCollection;
         private readonly UserManager<CustomUserModel> _userManager;
+        private readonly MongoDbContextProduct _context;
 
         // Constructor
-        public CheckoutController(IMongoCollection<Cart> cartCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomUserModel> userManager)
+        public CheckoutController(IMongoCollection<Cart> cartCollection, IMongoCollection<CheckoutModel> checkoutCollection, UserManager<CustomUserModel> userManager, MongoDbContextProduct context)
         {
             _cartCollection = cartCollection;
             _checkoutCollection = checkoutCollection;
             _userManager = userManager;
+            _context = context;
         }
         
         // Get All Checkouts
@@ -42,7 +45,7 @@ namespace EAD_BE.Controllers.User.Checkout
             {
                 return Unauthorized(new { Message = "User not logged in" });
             }
-            
+    
             if (currentUser.Email != userEmail)
             {
                 return BadRequest(new { Message = "You are not authorized to perform this action" });
@@ -55,8 +58,39 @@ namespace EAD_BE.Controllers.User.Checkout
             {
                 return NotFound(new { Message = "No checkouts found for the specified user" });
             }
+    
+            // Get the checkouts
+            var checkout = await _checkoutCollection.Find(c => c.UserEmail == userEmail).FirstOrDefaultAsync();
+            if (checkout == null)
+            {
+                return NotFound(new { Message = "Checkout not found for the specified user" });
+            }
 
-            return Ok(checkouts);
+            // Fetch product details for each item in the cart
+            var checkoutItems = new List<object>();
+            foreach (var item in checkout.Items)
+            {
+                var product = await _context.Products.Find(p => p.Id == item.ProductId).FirstOrDefaultAsync();
+                if (product != null)
+                {
+                    checkoutItems.Add(new
+                    {
+                        item.ProductId,
+                        item.ProductName,
+                        item.Price,
+                        item.Quantity,
+                        product.ProductPicture 
+                    });
+                }
+            }
+
+            return Ok(new
+            {
+                checkout.UserEmail,
+                checkout.CheckoutUuid,
+                checkout.CreatedAt,
+                Items = checkoutItems
+            });
         }
 
         // Checkout items in Cart
