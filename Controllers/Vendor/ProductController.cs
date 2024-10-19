@@ -85,6 +85,13 @@ namespace EAD_BE.Controllers.Vendor
             {
                 return BadRequest(new { Message = "User does not exist" });
             }
+            
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser.Email != product.AddedByUserEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to perform this action" });
+            }
+
 
             // Check if the category exists in the database
             var category = await _categoryCollection.Find(c => c.Id == product.Category).FirstOrDefaultAsync();
