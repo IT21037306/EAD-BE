@@ -31,6 +31,33 @@ namespace EAD_BE.Controllers.User.Checkout
             _checkoutCollection = checkoutCollection;
             _userManager = userManager;
         }
+        
+        // Get All Checkouts
+        [HttpGet("all-checkouts/{userEmail}")]
+        public async Task<IActionResult> GetAllCheckouts(String userEmail)
+        {
+            // Fetch the current logged-in user
+            var currentUser = await _userManager.GetUserAsync(User);
+            if (currentUser == null)
+            {
+                return Unauthorized(new { Message = "User not logged in" });
+            }
+            
+            if (currentUser.Email != userEmail)
+            {
+                return BadRequest(new { Message = "You are not authorized to perform this action" });
+            }
+
+            // Fetch all checkouts based on the UserEmail
+            var checkouts = await _checkoutCollection.Find(c => c.UserEmail == currentUser.Email).ToListAsync();
+
+            if (checkouts == null || !checkouts.Any())
+            {
+                return NotFound(new { Message = "No checkouts found for the specified user" });
+            }
+
+            return Ok(checkouts);
+        }
 
         // Checkout items in Cart
         [HttpPost("checkout/{userEmail}")]
